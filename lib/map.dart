@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'main.dart';
 
 const LatLng currentLocation = LatLng(25.0280277 ,121.5010426);
 
@@ -88,9 +89,10 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("藥局地圖"), // Set your header title here
+        title: const Text("藥局地圖"), 
+        // Set your header title here
       ),
-
+      drawer: AppDrawer(),
       body: GoogleMap(
         initialCameraPosition:
             const CameraPosition(target: currentLocation, zoom: 14),
