@@ -6,11 +6,11 @@ class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
 
   @override
-  _MyhomeState createState() => _MyhomeState();
+  State<Myhome> createState() => _MyhomeState();
 }
 
 class _MyhomeState extends State<Myhome> {
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int currentPage = 0;
   int totalItems = 300;
   int itemsPerPage = 30;
@@ -71,14 +71,14 @@ class _MyhomeState extends State<Myhome> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only(top: 10),
+              margin: const EdgeInsets.only(top: 10),
               width: 350,
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
                 color: Colors.grey[300],
               ),
-              child: TextField(
+              child: const TextField(
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: '搜尋',
@@ -102,16 +102,16 @@ class _MyhomeState extends State<Myhome> {
                   if (data.isEmpty ||
                       data.length <= page ||
                       data[page] == null) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   return ListView.builder(
                     itemCount: data[page].length,
                     itemBuilder: (BuildContext context, int index) {
                       return ListTile(
-                        leading: Icon(Icons.star),
+                        leading: const Icon(Icons.star),
                         title: Text(data[page][index]),
-                        subtitle: Text('2023-10-19'),
+                        subtitle: const Text('2023-10-19'),
                         onTap: () {
                           _navigateToDetailPage(data[page][index]);
                         },
@@ -125,20 +125,20 @@ class _MyhomeState extends State<Myhome> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     _pageController.previousPage(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
                   },
                 ),
                 Text('頁數 ${currentPage + 1}'),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                   onPressed: () {
                     _pageController.nextPage(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
                   },
