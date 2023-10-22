@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'detail.dart';
-
+import 'data/dbhelper.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({super.key});
@@ -15,28 +15,39 @@ class _MyhomeState extends State<Myhome> {
   int totalItems = 300;
   int itemsPerPage = 30;
   List<List<String>> data = [];
+  late DatabaseHelper _databaseHelper; // Declare a database helper instance
 
   @override
   void initState() {
     super.initState();
+    _databaseHelper = DatabaseHelper(
+        createDatabaseConnection()); // Initialize the database helper
     fetchPageData(currentPage);
   }
 
-  void fetchPageData(int page) {
+  void fetchPageData(int page) async {
+    // Open the database connection
+    await _databaseHelper.openConnection();
+
+    // Execute database operation
+    final data = await _databaseHelper.fetchMedData();
+
+    print(data);
+    // Close the database connection
+    await _databaseHelper.closeConnection();
+
+    print(data.length);
     if (data.length <= page) {
       List<String> pageData = [];
       int startIndex = page * itemsPerPage + 1;
       int endIndex = (page + 1) * itemsPerPage;
-      for (int i = startIndex; i <= endIndex; i++) {
-        pageData.add('項目 $i');
-      }
 
-      setState(() {
-        while (data.length <= page) {
-          data.add([]);
-        }
-        data[page] = pageData;
-      });
+      // setState(() {
+      //   while (data.length <= page) {
+      //     data.add([]);
+      //   }
+      //   data[page] = pageData;
+      // });
     }
   }
 
@@ -182,7 +193,6 @@ class _MyhomeState extends State<Myhome> {
       //     ],
       //   ),
       // ),
-      
     );
   }
 }
