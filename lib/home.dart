@@ -3,7 +3,7 @@ import 'detail.dart';
 
 
 class Myhome extends StatefulWidget {
-  const Myhome({Key? key}) : super(key: key);
+  const Myhome({super.key});
 
   @override
   State<Myhome> createState() => _MyhomeState();
