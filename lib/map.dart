@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'main.dart';
+import 'data/dbhelper.dart';
 
-const LatLng currentLocation = LatLng(25.0280277 ,121.5010426);
+const LatLng currentLocation = LatLng(25.0423168, 121.5255206);
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+  const MapPage({super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -13,89 +14,36 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   late GoogleMapController _mapController;
-  Map<String, Marker> _markers = {};
+  final Map<String, Marker> _markers = {};
+  late DatabaseHelper _databaseHelper; // Declare a database helper instance
 
-  // Sample data for markers
-  final List<Map<String, dynamic>> markerData = [
-      {
-        "id":"1",
-        "gender": "男",
-        "pharmacy_name": "活力健康藥妝藥局",
-        "phone": "23392625",
-        "leader_name": "蕭聖鈞",
-        "street": "中華路二段315巷1號",
-        "city": "臺北市",
-        "town": "中正區",
-        "full_address": "臺北市中正區中華路二段315巷1號",
-        "latitude": 25.0280277,
-        "longitude": 121.5060826
-    },
-    {
-      "id":"2",
-      "gender": "女",
-      "pharmacy_name": "建祥武昌藥局",
-      "phone": "2381-5229",
-      "leader_name": "黃盟婷",
-      "street": "武昌街1段29號1樓",
-      "city": "臺北市",
-      "town": "中正區",
-      "full_address": "臺北市中正區武昌街1段29號1樓",
-      "latitude": 25.1485078,
-      "longitude": 121.7631554
-    },
-    {
-      "id":"3",
-      "gender": "男",
-      "pharmacy_name": "保德中華藥局",
-      "phone": "02-23027720",
-      "leader_name": "蕭宇凱",
-      "street": "中華路二段159號",
-      "city": "臺北市",
-      "town": "中正區",
-      "full_address": "臺北市中正區中華路二段159號",
-      "latitude": 25.0309765,
-      "longitude": 121.5042361
-    },
-    {
-      "id":"4",
-      "gender": "男",
-      "pharmacy_name": "71恩典藥局",
-      "phone": "23223371",
-      "leader_name": "洪增陽",
-      "street": "信義路二段71號",
-      "city": "臺北市",
-      "town": "中正區",
-      "full_address": "臺北市中正區信義路二段71號",
-      "latitude": 25.03468,
-      "longitude": 121.526427
-    },
-    {
-      "id":"5",
-      "gender": "男",
-      "pharmacy_name": "豐仁藥局",
-      "phone": "02-23033908",
-      "leader_name": "黃敬堯",
-      "street": "寧波西街161號",
-      "city": "臺北市",
-      "town": "中正區",
-      "full_address": "臺北市中正區寧波西街161號",
-      "latitude": 25.0273874,
-      "longitude": 121.5109243
-    },
-    // Add more locations here
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _databaseHelper = DatabaseHelper(createDatabaseConnection()); // 初始化 _databaseHelper
+  }
+
+  Future<List<Map<String, dynamic>>?> fetchDataFromPostgreSQL() async {
+    await _databaseHelper.openConnection();
+    final data = await _databaseHelper.fetchPharmacyData();
+    await _databaseHelper.closeConnection();
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("藥局地圖"), 
+        title: const Text("藥局地圖"),
         // Set your header title here
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: GoogleMap(
         initialCameraPosition:
-            const CameraPosition(target: currentLocation, zoom: 14),
+            const CameraPosition(
+              target: currentLocation, 
+              zoom: 15
+        ),
         onMapCreated: (GoogleMapController controller) {
           _mapController = controller;
           _addMarkers();
@@ -105,66 +53,77 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-   void _addMarkers() async {
-
+  void _addMarkers() async {
     // Create a custom icon for the current location marker
-    var customIcon = await BitmapDescriptor.fromAssetImage(
-          const ImageConfiguration(), 'assets/images/user.png');
+    // var customIcon = await BitmapDescriptor.fromAssetImage(
+    //     const ImageConfiguration(), 'assets/images/user.png');
 
-    // Add the current location marker
-    _markers["0"] = Marker(
-      markerId: MarkerId("0".toString()), // Use a string as the marker ID
-      position: currentLocation,
-      icon: customIcon,
-    );
+    // // Add the current location marker
+    // _markers["0"] = Marker(
+    //   markerId: MarkerId("0".toString()), // Use a string as the marker ID
+    //   position: currentLocation,
+    //   icon: customIcon,
+    // );
 
-    for (var data in markerData) {
-      var markerIcon = await BitmapDescriptor.fromAssetImage(
-          const ImageConfiguration(), 'assets/images/drugstore.png');
+    final markerData = await fetchDataFromPostgreSQL();
+    print(markerData);
 
-      var marker = Marker(
-        markerId: MarkerId(data["id"].toString()),
-        position: LatLng(data["latitude"], data["longitude"]),
-        infoWindow: InfoWindow(
-          title: data["pharmacy_name"],
-          onTap: () {
-            _showCustomInfoWindow(context, data);
-          },
-        ),
-        icon: markerIcon,
-      );
+    if (markerData != null) {
+      for (var data in markerData) {
+        var markerIcon = await BitmapDescriptor.fromAssetImage(
+            const ImageConfiguration(), 'assets/images/drugstore.png');
+        // print(data);
 
-      _markers[data["id"].toString()] = marker;
+        var latitude = double.parse(data["latitude"].toString());
+        var longitude = double.parse(data["longitude"].toString());
+
+        var marker = Marker(
+          markerId: MarkerId(data["id"].toString()),
+          position:  LatLng(latitude, longitude),
+          infoWindow: InfoWindow(
+            title: data["pharmacy_name"],
+            onTap: () {
+              _showCustomInfoWindow(context, data);
+            },
+          ),
+          icon: markerIcon,
+        );
+
+        _markers[data["id"].toString()] = marker;
+      }
     }
 
-    
     setState(() {});
   }
 
   void _showCustomInfoWindow(BuildContext context, Map<String, dynamic> data) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        content: IntrinsicWidth(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                data["pharmacy_name"],
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text('業者: ${data["leader_name"]}'),
-              Text('電話: ${data["phone"]}'),
-              Text('地址: ${data["full_address"]}'),
-            ],
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
           ),
-        ),
-      );
-    },
-  );
-}
+          content: IntrinsicWidth(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data["pharmacy_name"],
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text('業者: ${data["leader_name"]}'),
+                Text('電話: ${data["phone"]}'),
+                Text('地址: ${data["full_address"]}'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

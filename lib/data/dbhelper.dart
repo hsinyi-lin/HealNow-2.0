@@ -51,4 +51,15 @@ class DatabaseHelper {
   }
 
   // Add other database operation methods
+  Future<List<Map<String, dynamic>>> fetchPharmacyData() async {
+    final result = await _connection.query('SELECT * FROM pharmacy');
+    // for (final row in result) {
+    //   final id = row[0];
+    //   final pharmacyName = row[1];
+    //   print('ID: $id, Name: $pharmacyName');
+    // }
+
+    final dataList = result.map((row) => row.toColumnMap());
+    return dataList.toList();
+  }
 }
