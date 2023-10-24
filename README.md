@@ -1,4 +1,4 @@
-# test_app
+#  HealNow
 
 A new Flutter project.
 
