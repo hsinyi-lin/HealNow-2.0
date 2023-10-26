@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'detail.dart';  // 替換為你的詳細資訊頁面的引入
+import 'med_info.dart';  // 替換為你的詳細資訊頁面的引入
 import 'data/dbhelper.dart';
 
 class Myhome extends StatefulWidget {
@@ -59,7 +59,7 @@ class _MyhomeState extends State<Myhome> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DetailPage(title: itemTitle),
+        builder: (context) => MedPage(title: itemTitle),
       ),
     );
   }
