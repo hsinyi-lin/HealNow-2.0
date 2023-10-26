@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'map.dart';
-
+import 'mood.dart';
 
 void main() {
   runApp(
@@ -72,6 +72,16 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const MapPage()),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('記錄心情'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MoodPage()),
               );
             },
           ),
