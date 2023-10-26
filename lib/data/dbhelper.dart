@@ -37,6 +37,7 @@ class DatabaseHelper {
   //     'city': 'Los Angeles',
   //   }
   // ];
+
   Future<List<Map<String, dynamic>>> fetchMedData() async {
     final result = await _connection.query('SELECT * FROM med limit 60');
 
@@ -48,6 +49,15 @@ class DatabaseHelper {
 
     final dataList = result.map((row) => row.toColumnMap());
     return dataList.toList();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchMedDataByTitle(String title) async {
+    final result = await _connection.query(
+      'SELECT * FROM med WHERE med_tw_name = @title OR med_en_name = @title',
+      substitutionValues: {'title': title},
+    );
+
+    return result.map((row) => row.toColumnMap()).toList();
   }
 
   // Add other database operation methods
