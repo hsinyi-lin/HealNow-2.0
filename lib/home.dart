@@ -1,55 +1,59 @@
 import 'package:flutter/material.dart';
-import 'detail.dart';
+import 'detail.dart';  // 替換為你的詳細資訊頁面的引入
 import 'data/dbhelper.dart';
 
 class Myhome extends StatefulWidget {
-  const Myhome({super.key});
+  const Myhome({Key? key}) : super(key: key);
 
   @override
   State<Myhome> createState() => _MyhomeState();
 }
 
 class _MyhomeState extends State<Myhome> {
-  final PageController _pageController = PageController();
-  int currentPage = 0;
-  int totalItems = 300;
-  int itemsPerPage = 30;
-  List<List<String>> data = [];
-  late DatabaseHelper _databaseHelper; // Declare a database helper instance
+  final TextEditingController _searchController = TextEditingController();
+  late DatabaseHelper _databaseHelper;
+  List<Map<String, dynamic>> _searchResults = [];
+  List<Map<String, dynamic>> _allData = [];
 
   @override
   void initState() {
     super.initState();
-    _databaseHelper = DatabaseHelper(
-        createDatabaseConnection()); // Initialize the database helper
-    fetchPageData(currentPage);
+    _databaseHelper = DatabaseHelper(createDatabaseConnection());
+    _loadAllData(); // 初始化時載入所有資料
   }
 
-  void fetchPageData(int page) async {
-    // Open the database connection
+  // 載入所有數據
+  Future<void> _loadAllData() async {
     await _databaseHelper.openConnection();
-
-    // Execute database operation
     final data = await _databaseHelper.fetchMedData();
-
-    print(data);
-    // Close the database connection
     await _databaseHelper.closeConnection();
 
-    print(data.length);
-    if (data.length <= page) {
-      List<String> pageData = [];
-      int startIndex = page * itemsPerPage + 1;
-      int endIndex = (page + 1) * itemsPerPage;
-
-      // setState(() {
-      //   while (data.length <= page) {
-      //     data.add([]);
-      //   }
-      //   data[page] = pageData;
-      // });
-    }
+    setState(() {
+      _allData = data;
+      _searchResults = data;
+    });
   }
+
+  Future<void> _searchData(String searchTerm) async {
+  if (searchTerm.isEmpty) {
+    // 如果搜索文本为空，显示所有数据
+    setState(() {
+      _searchResults = _allData;
+    });
+  } else {
+    final results = _allData.where((item) =>
+        item['med_tw_name']
+            .toLowerCase()
+            .contains(searchTerm.toLowerCase()) ||
+        item['med_en_name']
+            .toLowerCase()
+            .contains(searchTerm.toLowerCase()));
+
+    setState(() {
+      _searchResults = results.toList();
+    });
+  }
+}
 
   void _navigateToDetailPage(String itemTitle) {
     Navigator.push(
@@ -63,136 +67,41 @@ class _MyhomeState extends State<Myhome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   leading: Builder(
-      //     builder: (BuildContext innerContext) {
-      //       return IconButton(
-      //         icon: Icon(Icons.menu),
-      //         onPressed: () {
-      //           Scaffold.of(innerContext).openDrawer();
-      //         },
-      //       );
-      //     },
-      //   ),
-      //   title: const Text('Example title'),
-      //   actions: const [],
-      // ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              width: 350,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                color: Colors.grey[300],
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: '搜尋',
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: '輸入搜尋文字',
+                suffixIcon: IconButton(
                   icon: Icon(Icons.search),
+                  onPressed: () {
+                    _searchData(_searchController.text);
+                  },
                 ),
               ),
             ),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: (totalItems / itemsPerPage).ceil(),
-                onPageChanged: (int page) {
-                  setState(() {
-                    currentPage = page;
-                    if (data.length <= page) {
-                      fetchPageData(page);
-                    }
-                  });
-                },
-                itemBuilder: (BuildContext context, int page) {
-                  if (data.isEmpty ||
-                      data.length <= page ||
-                      data[page] == null) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  return ListView.builder(
-                    itemCount: data[page].length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        leading: const Icon(Icons.star),
-                        title: Text(data[page][index]),
-                        subtitle: const Text('2023-10-19'),
-                        onTap: () {
-                          _navigateToDetailPage(data[page][index]);
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _searchResults.length,
+              itemBuilder: (context, index) {
+                final med_tw_name = _searchResults[index]['med_tw_name'];
+                final med_en_name = _searchResults[index]['med_en_name'];
+                return ListTile(
+                  title: Text('$med_tw_name'),
+                  subtitle: Text('$med_en_name'),
+                  onTap: () {
+                    _navigateToDetailPage(med_tw_name);
                   },
-                ),
-                Text('頁數 ${currentPage + 1}'),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                ),
-              ],
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      // drawer: Drawer(
-      //   child: ListView(
-      //     children: [
-      //       ListTile(
-      //         title: Text('首頁'),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //       ListTile(
-      //         title: Text('闢謠專區'),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //       ListTile(
-      //         title: Text('身體安全的新聞'),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //       ListTile(
-      //         title: Text('藥局地圖'),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //           Navigator.push(
-      //             context,
-      //             MaterialPageRoute(builder: (context) => MapPage()),
-      //           );
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }
