@@ -36,6 +36,29 @@ class _MoodPageState extends State<MoodPage> {
     return data;
   }
 
+  Future<void> addMoodData(String content) async {
+    final now = DateTime.now();
+    final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+
+    // 新增資料
+    final dbHelper = DatabaseHelper();
+
+    final data = {
+      'content': content,
+      'mood_id': 0,
+      'ai_reply': '......',
+      'created_at': formattedDateTime,
+      'updated_at': formattedDateTime,
+    };
+    await dbHelper.insertData(data);
+
+    setState(() {
+      // 更新狀態，這將觸發刷新
+      hasMoodEntered = true;
+      moodTextController.text = '';
+    });
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -50,7 +73,7 @@ class _MoodPageState extends State<MoodPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}')); //錯誤訊息
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('没有資料')); 
+            return const Center(child: Text('没有資料'));
           } else {
             final data = snapshot.data!;
             return ListView.builder(
@@ -78,15 +101,14 @@ class _MoodPageState extends State<MoodPage> {
       child: Column(
         children: <Widget>[
           ListTile(
-           title: Column(
+            title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item['updated_at'],
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-                ),
+                Text(item['updated_at'],
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
-                Text(item['ai_reply']),
+                Text(item['content']),
               ],
             ),
           ),
@@ -104,7 +126,9 @@ class _MoodPageState extends State<MoodPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('ChatGPT回覆',style:TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text('ChatGPT回覆',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
                 Text(item['ai_reply']),
               ],
@@ -144,24 +168,7 @@ class _MoodPageState extends State<MoodPage> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      print(moodTextController.text);
-
-                      final now = DateTime.now();
-                      final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-
-                      // 新增資料
-                      final dbHelper = DatabaseHelper();
-                      
-                      final data = {
-                        'content': moodTextController.text,
-                        'mood_id': 0,
-                        'ai_reply': '......',
-                        'created_at': formattedDateTime,
-                        'updated_at': formattedDateTime,
-                      };
-                      dbHelper.insertData(data);
-                      hasMoodEntered = true;
-                      moodTextController.text = ''; // 清空TextField
+                      addMoodData(moodTextController.text);
                     },
                     child: const Text('確認'),
                   ),
