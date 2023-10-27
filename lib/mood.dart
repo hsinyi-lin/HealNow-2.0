@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'package:intl/intl.dart';
+import 'data/sqliteHelper.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -20,6 +21,29 @@ class _MoodPageState extends State<MoodPage> {
   void initState() {
     super.initState();
     moodTextController.text = '';
+
+    // 初始化資料庫
+    final dbHelper = DatabaseHelper();
+    dbHelper.initDb();
+
+    // 添加下面的代码来获取并显示数据
+    getAllMoodData().then((data) {
+      if (data != null) {
+        setState(() {
+          moodTexts = data.map((item) {
+            return '${item['created_at']}\n${item['content']}';
+          }).toList();
+          print(moodTexts);
+        });
+      }
+    });
+  }
+
+  Future<List<Map<String, dynamic>>?> getAllMoodData() async {
+    final dbHelper = DatabaseHelper();
+    final data = await dbHelper.getAllData();
+    print(data);
+    return data;
   }
 
   void _showMoodInput() {
@@ -63,6 +87,17 @@ class _MoodPageState extends State<MoodPage> {
                         hasMoodEntered = true;
                       });
                       Navigator.of(context).pop();
+                      // 新增資料
+                      final dbHelper = DatabaseHelper();
+                      final data = {
+                        'content': moodTextController.text,
+                        'mood_id': 0,
+                        'ai_reply': '......',
+                        'created_at': currentDate,
+                        'updated_at': currentDate,
+                      };
+                      dbHelper.insertData(data);
+
                       if (hasMoodEntered) {
                         int index = moodTexts
                             .indexWhere((text) => text.startsWith(currentDate));
