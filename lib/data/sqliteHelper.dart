@@ -2,27 +2,35 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:intl/intl.dart';
 
-class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper.internal();
-  factory DatabaseHelper() => _instance;
+class SQLiteDatabaseHelper {
+  // 第一個internal用於內部初始化，確保只創建一個類別實例
+  static final SQLiteDatabaseHelper _instance = SQLiteDatabaseHelper.internal();
 
+  // 定義一個factory 函式，以返回類別的單一實例
+  factory SQLiteDatabaseHelper() => _instance;
+
+  // 私有的靜態資料庫實體
   static Database? _db;
-
+  
+  // 用於訪問資料庫
   Future<Database> get db async {
     if (_db != null) {
-      return _db!;
+      return _db!;  // ! 用於確保不是null
     }
     _db = await initDb();
     return _db!;
   }
 
-  DatabaseHelper.internal();
-
+  // 此internal是為了外部使用，當外部使用SQLiteDatabaseHelper()，實際上是在調用factory函式
+  SQLiteDatabaseHelper.internal();
+  
+  // 資料庫初始化
   Future<Database> initDb() async {
     String databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'heal_now.db');
 
     // await deleteDatabase(path);
+
     // 開啟連線
     var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return theDb;
@@ -34,8 +42,8 @@ class DatabaseHelper {
     dbClient.close();
   }
 
+  // 建立資料表
   void _onCreate(Database db, int version) async {
-    // 建立資料表
     await db.execute('''
       CREATE TABLE mood (
         id INTEGER PRIMARY KEY,
@@ -48,7 +56,7 @@ class DatabaseHelper {
     ''');
   }
 
-  // 新增
+  // 新增資料
   Future<int> insertData(Map<String, dynamic> data) async {
     var dbClient = await db;
 
@@ -62,7 +70,7 @@ class DatabaseHelper {
     return await dbClient.insert('mood', data);
   }
 
-  // 編輯
+  // 編輯資料
   Future<int> updateData(Map<String, dynamic> data) async {
     var dbClient = await db;
     return await dbClient.update(

@@ -25,24 +25,27 @@ class _MoodPageState extends State<MoodPage> {
     moodTextController.text = '';
 
     // 初始化資料庫
-    final dbHelper = DatabaseHelper();
+    final dbHelper = SQLiteDatabaseHelper();
     dbHelper.initDb();
 
-    // 添加下面的代码来获取并显示数据
+    // 取得情緒資料
     getAllMoodData();
   }
 
+  // 取得情緒資料函式
   Future<List<Map<String, dynamic>>?> getAllMoodData() async {
-    final dbHelper = DatabaseHelper();
+    final dbHelper = SQLiteDatabaseHelper();
     final data = await dbHelper.getAllData();
     print(data);
     return data;
   }
 
+  // 新增情緒資料函式
   Future<void> addMoodData(String content) async {
     final now = DateTime.now();
     final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
+    // 呼叫ChatGPT模型
     const apiUrl = 'https://api.openai.com/v1/chat/completions';
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -60,17 +63,18 @@ class _MoodPageState extends State<MoodPage> {
       }),
     );
 
+    // 處理呼叫後資料，並且正式新增
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       print(result);
       String aiReply = result['choices'][0]['message']['content'];
 
       print(aiReply);
-      final dbHelper = DatabaseHelper();
+      final dbHelper = SQLiteDatabaseHelper();
       final data = {
         'content': content,
         'mood_id': 0,
-        'ai_reply': aiReply, // 使用 OpenAI 的回復
+        'ai_reply': aiReply, // 使用 OpenAI 的回應
         'created_at': formattedDateTime,
         'updated_at': formattedDateTime,
       };
@@ -96,23 +100,24 @@ class _MoodPageState extends State<MoodPage> {
         future: getAllMoodData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator()); // 轉圈
+            return const Center(child: CircularProgressIndicator()); // 讀取
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}')); //錯誤訊息
+            return Center(child: Text('Error: ${snapshot.error}')); //用於錯誤訊息
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('没有資料'));
           } else {
             final data = snapshot.data!;
             return ListView.builder(
-              itemCount: data.length,
+              itemCount: data.length, // item筆數
               itemBuilder: (context, index) {
                 final item = data[index];
-                return buildCard(item);
+                return buildCard(item); // 建立Card以存放各item
               },
             );
           }
         },
       ),
+      // 用於新增按鈕
       floatingActionButton: FloatingActionButton(
         onPressed: _showMoodInput,
         child: const Icon(Icons.add),
@@ -120,6 +125,7 @@ class _MoodPageState extends State<MoodPage> {
     );
   }
 
+  // Card函式
   Widget buildCard(Map<String, dynamic> item) {
     print(item);
     return Card(
@@ -153,7 +159,7 @@ class _MoodPageState extends State<MoodPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('ChatGPT回覆',
+                const Text('AI心理師',
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
@@ -166,6 +172,7 @@ class _MoodPageState extends State<MoodPage> {
     );
   }
 
+  // 按下新增按鈕顯示的Dialog
   void _showMoodInput() {
     showDialog(
       context: context,
@@ -181,11 +188,11 @@ class _MoodPageState extends State<MoodPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Text('今日心情'),
+                  const Text('紀錄心情'),
                   TextField(
                     controller: moodTextController,
                     decoration: InputDecoration(
-                      hintText: '輸入心情日記',
+                      hintText: '說說怎麼了吧!',
                       hintStyle: TextStyle(
                           color: moodTextFocus.hasFocus
                               ? Colors.black
