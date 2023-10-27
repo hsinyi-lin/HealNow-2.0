@@ -33,11 +33,11 @@ class _MoodPageState extends State<MoodPage> {
           child: FractionallySizedBox(
             widthFactor: 0.9,
             child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text('今日心情'),
+                  const Text('今日心情'),
                   if (currentDate.isNotEmpty) Text(currentDate),
                   TextField(
                     controller: moodTextController,
@@ -76,7 +76,7 @@ class _MoodPageState extends State<MoodPage> {
                       }
                       moodTextController.text = '';
                     },
-                    child: Text('確認'),
+                    child: const Text('確認'),
                   ),
                 ],
               ),
@@ -104,7 +104,7 @@ class _MoodPageState extends State<MoodPage> {
       body: ListView(
         children: moodTexts.map((text) {
           return Card(
-            margin: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
             elevation: 3,
             child: Column(
               children: <Widget>[
@@ -112,14 +112,14 @@ class _MoodPageState extends State<MoodPage> {
                   title: Text(text),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                       vertical: 2, horizontal: 20), // 设置分隔线的padding
-                  child: Divider(
-                    color: const Color.fromARGB(255, 204, 203, 203), // 设置分隔线颜色
+                  child: const Divider(
+                    color: Color.fromARGB(255, 204, 203, 203), // 设置分隔线颜色
                     thickness: 2, // 设置分隔线粗细
                   ),
                 ),
-                ListTile(
+                const ListTile(
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

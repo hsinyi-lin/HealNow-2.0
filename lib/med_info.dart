@@ -5,7 +5,7 @@ import 'package:intl/intl.dart'; // 导入日期格式化的库
 class MedPage extends StatefulWidget {
   final String title; // 接收所選列表的標題
 
-  MedPage({required this.title, Key? key}) : super(key: key);
+  const MedPage({required this.title, super.key});
 
   @override
   State<MedPage> createState() => _MedPageState();
@@ -43,11 +43,11 @@ class _MedPageState extends State<MedPage> {
         future: fetchData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No data available'));
+            return const Center(child: Text('No data available'));
           } else {
             final data = snapshot.data;
 
@@ -74,11 +74,11 @@ class _MedPageState extends State<MedPage> {
 
                 return Card(
                   color: Colors.blue[50], // 添加顏色
-                  margin: EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(8),
                   child: ListTile(
                     title: Text(
                       med_tw_name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -90,79 +90,79 @@ class _MedPageState extends State<MedPage> {
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('英文名: $med_en_name',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('類型: $med_type',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('成分: $composition',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('適應症: $indications',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('使用方法: $how_to_use',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('批准號: $permit_num',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('批准類型: $permit_type',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('批准日期: $formatpermit_date',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
 
-                        Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
                         
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
                           child: Text('過期日期: $formatexpiration_date',
-                              style: TextStyle(color: Colors.black87)),
+                              style: const TextStyle(color: Colors.black87)),
                         ),
                       ],
                     ),

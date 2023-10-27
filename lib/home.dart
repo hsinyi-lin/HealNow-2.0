@@ -3,7 +3,7 @@ import 'med_info.dart';  // 替換為你的詳細資訊頁面的引入
 import 'data/dbhelper.dart';
 
 class Myhome extends StatefulWidget {
-  const Myhome({Key? key}) : super(key: key);
+  const Myhome({super.key});
 
   @override
   State<Myhome> createState() => _MyhomeState();
