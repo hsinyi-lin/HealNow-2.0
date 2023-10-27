@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'main.dart';
 import 'data/sqliteHelper.dart';
 
 class MoodPage extends StatefulWidget {
@@ -40,25 +43,49 @@ class _MoodPageState extends State<MoodPage> {
     final now = DateTime.now();
     final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
-    // 新增資料
-    final dbHelper = DatabaseHelper();
+    const apiUrl = 'https://api.openai.com/v1/chat/completions';
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Bearer openai_key',
+      },
+      body: json.encode({
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {"role": "system", "content": "你是一位會用一句話給予鼓勵的心理諮商師"},
+          {"role": "user", "content": content}
+        ]
+      }),
+    );
 
-    final data = {
-      'content': content,
-      'mood_id': 0,
-      'ai_reply': '......',
-      'created_at': formattedDateTime,
-      'updated_at': formattedDateTime,
-    };
-    await dbHelper.insertData(data);
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      print(result);
+      String aiReply = result['choices'][0]['message']['content'];
 
-    setState(() {
-      // 更新狀態，這將觸發刷新
-      hasMoodEntered = true;
-      moodTextController.text = '';
-    });
+      print(aiReply);
+      final dbHelper = DatabaseHelper();
+      final data = {
+        'content': content,
+        'mood_id': 0,
+        'ai_reply': aiReply, // 使用 OpenAI 的回復
+        'created_at': formattedDateTime,
+        'updated_at': formattedDateTime,
+      };
+      await dbHelper.insertData(data);
+
+      setState(() {
+        hasMoodEntered = true;
+        moodTextController.text = '';
+      });
+    } else {
+      print('Failed to get AI reply. Status code: ${response.statusCode}');
+    }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
