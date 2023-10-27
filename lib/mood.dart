@@ -11,7 +11,6 @@ class MoodPage extends StatefulWidget {
 }
 
 class _MoodPageState extends State<MoodPage> {
-  List<String> moodTexts = [];
   TextEditingController moodTextController = TextEditingController();
   FocusNode moodTextFocus = FocusNode();
   String currentDate = '';
@@ -27,16 +26,7 @@ class _MoodPageState extends State<MoodPage> {
     dbHelper.initDb();
 
     // 添加下面的代码来获取并显示数据
-    getAllMoodData().then((data) {
-      if (data != null) {
-        setState(() {
-          moodTexts = data.map((item) {
-            return '${item['created_at']}\n${item['content']}';
-          }).toList();
-          print(moodTexts);
-        });
-      }
-    });
+    getAllMoodData();
   }
 
   Future<List<Map<String, dynamic>>?> getAllMoodData() async {
@@ -44,6 +34,85 @@ class _MoodPageState extends State<MoodPage> {
     final data = await dbHelper.getAllData();
     print(data);
     return data;
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("記錄心情"),
+      ),
+      drawer: const AppDrawer(),
+      body: FutureBuilder<List<Map<String, dynamic>>?>(
+        future: getAllMoodData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator()); // 轉圈
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}')); //錯誤訊息
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('没有資料')); 
+          } else {
+            final data = snapshot.data!;
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final item = data[index];
+                return buildCard(item);
+              },
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showMoodInput,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget buildCard(Map<String, dynamic> item) {
+    print(item);
+    return Card(
+      margin: const EdgeInsets.all(10),
+      elevation: 3,
+      child: Column(
+        children: <Widget>[
+          ListTile(
+           title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['updated_at'],
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                ),
+                const SizedBox(height: 5),
+                Text(item['ai_reply']),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 2,
+              horizontal: 20,
+            ),
+            child: const Divider(
+              color: Color.fromARGB(255, 204, 203, 203),
+              thickness: 2,
+            ),
+          ),
+          ListTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('ChatGPT回覆',style:TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                Text(item['ai_reply']),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showMoodInput() {
@@ -62,17 +131,10 @@ class _MoodPageState extends State<MoodPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   const Text('今日心情'),
-                  if (currentDate.isNotEmpty) Text(currentDate),
                   TextField(
                     controller: moodTextController,
-                    focusNode: moodTextFocus,
-                    onChanged: (text) {
-                      setState(() {
-                        // 不再更新moodText
-                      });
-                    },
                     decoration: InputDecoration(
-                      hintText: hasMoodEntered ? '修改今日心情' : '輸入今日心情',
+                      hintText: '輸入心情日記',
                       hintStyle: TextStyle(
                           color: moodTextFocus.hasFocus
                               ? Colors.black
@@ -81,35 +143,25 @@ class _MoodPageState extends State<MoodPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        currentDate =
-                            DateFormat('yyyy-MM-dd').format(DateTime.now());
-                        hasMoodEntered = true;
-                      });
                       Navigator.of(context).pop();
+                      print(moodTextController.text);
+
+                      final now = DateTime.now();
+                      final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+
                       // 新增資料
                       final dbHelper = DatabaseHelper();
+                      
                       final data = {
                         'content': moodTextController.text,
                         'mood_id': 0,
                         'ai_reply': '......',
-                        'created_at': currentDate,
-                        'updated_at': currentDate,
+                        'created_at': formattedDateTime,
+                        'updated_at': formattedDateTime,
                       };
                       dbHelper.insertData(data);
-
-                      if (hasMoodEntered) {
-                        int index = moodTexts
-                            .indexWhere((text) => text.startsWith(currentDate));
-                        if (index != -1) {
-                          moodTexts[index] =
-                              '$currentDate\n${moodTextController.text}';
-                        } else {
-                          moodTexts
-                              .add('$currentDate\n${moodTextController.text}');
-                        }
-                      }
-                      moodTextController.text = '';
+                      hasMoodEntered = true;
+                      moodTextController.text = ''; // 清空TextField
                     },
                     child: const Text('確認'),
                   ),
@@ -127,59 +179,5 @@ class _MoodPageState extends State<MoodPage> {
     moodTextController.dispose();
     moodTextFocus.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("記錄心情"),
-      ),
-      drawer: const AppDrawer(),
-      body: ListView(
-        children: moodTexts.map((text) {
-          return Card(
-            margin: const EdgeInsets.all(10),
-            elevation: 3,
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  title: Text(text),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 2, horizontal: 20), // 设置分隔线的padding
-                  child: const Divider(
-                    color: Color.fromARGB(255, 204, 203, 203), // 设置分隔线颜色
-                    thickness: 2, // 设置分隔线粗细
-                  ),
-                ),
-                const ListTile(
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('ChatGPT回覆',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 5), // 在两个文本之间增加5px的间距
-                      Text('自动回复：这是自动回复的内容'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          moodTextFocus.requestFocus();
-          _showMoodInput();
-        },
-        tooltip: 'Increment',
-        child: Icon(hasMoodEntered ? Icons.edit : Icons.add),
-      ),
-      resizeToAvoidBottomInset: false,
-    );
   }
 }

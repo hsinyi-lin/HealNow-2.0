@@ -21,9 +21,11 @@ class DatabaseHelper {
     String databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'heal_now.db');
 
+
     // 開啟連線
     var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return theDb;
+    
   }
 
   // 關閉連線
@@ -39,9 +41,9 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY,
         content TEXT,
         mood_id INTEGER,
-        ai_reply TEXT
-        created_at TEXT,
-        updated_at TEXT
+        ai_reply TEXT,
+        created_at DATETIME,
+        updated_at DATETIME
       )
     ''');
   }
