@@ -1,5 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'med_info.dart';  // 替換為你的詳細資訊頁面的引入
+import 'med_info.dart'; // 替換為你的詳細資訊頁面的引入
 import 'data/dbhelper.dart';
 
 class Myhome extends StatefulWidget {
@@ -35,38 +37,53 @@ class _MyhomeState extends State<Myhome> {
   }
 
   Future<void> _searchData(String searchTerm) async {
-  if (searchTerm.isEmpty) {
-    // 如果搜索文本为空，显示所有数据
-    setState(() {
-      _searchResults = _allData;
-    });
-  } else {
-    final results = _allData.where((item) =>
-        item['med_tw_name']
-            .toLowerCase()
-            .contains(searchTerm.toLowerCase()) ||
-        item['med_en_name']
-            .toLowerCase()
-            .contains(searchTerm.toLowerCase()));
+    if (searchTerm.isEmpty) {
+      // 如果搜索文本为空，显示所有数据
+      setState(() {
+        _searchResults = _allData;
+      });
+    } else {
+      final results = _allData.where((item) =>
+          item['med_tw_name']
+              .toLowerCase()
+              .contains(searchTerm.toLowerCase()) ||
+          item['med_en_name'].toLowerCase().contains(searchTerm.toLowerCase()));
 
-    setState(() {
-      _searchResults = results.toList();
-    });
+      setState(() {
+        _searchResults = results.toList();
+      });
+    }
   }
-}
 
-  void _navigateToDetailPage(String itemTitle) {
+  void _navigateToDetailPage(String itemTitle, int itemId) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MedPage(title: itemTitle),
+        builder: (context) => MedPage(title: itemTitle, id: itemId),
       ),
     );
+  }
+
+  // 从这个列表中选择随机图标
+  final List<IconData> randomIcons = [
+    Icons.medical_services,
+    Icons.vaccines,
+    Icons.bloodtype,
+    Icons.healing
+  ];
+
+  // 获取随机图标的方法
+  IconData getRandomIcon() {
+    final random = Random();
+    final randomIndex = random.nextInt(randomIcons.length);
+    return randomIcons[randomIndex];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 179, 255, 249),
+      
       body: Column(
         children: <Widget>[
           Padding(
@@ -76,7 +93,7 @@ class _MyhomeState extends State<Myhome> {
               decoration: InputDecoration(
                 hintText: '輸入搜尋文字',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: () {
                     _searchData(_searchController.text);
                   },
@@ -88,14 +105,27 @@ class _MyhomeState extends State<Myhome> {
             child: ListView.builder(
               itemCount: _searchResults.length,
               itemBuilder: (context, index) {
-                final med_tw_name = _searchResults[index]['med_tw_name'];
-                final med_en_name = _searchResults[index]['med_en_name'];
-                return ListTile(
-                  title: Text('$med_tw_name'),
-                  subtitle: Text('$med_en_name'),
-                  onTap: () {
-                    _navigateToDetailPage(med_tw_name);
-                  },
+                final id = _searchResults[index]['id'];
+                final medTwName = _searchResults[index]['med_tw_name'];
+                final medEnName = _searchResults[index]['med_en_name'];
+
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(getRandomIcon(),
+                          color: Color(0xFF1179FA)), // 使用随机图标
+                      title: Text('$medTwName'),
+                      subtitle: Text('$medEnName'),
+                      onTap: () {
+                        _navigateToDetailPage(medTwName, id);
+                      },
+                    ),
+                    const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16.0), // 设置水平内边距
+                      child: Divider(height: 1, color: Colors.grey), // 添加分隔线
+                    ),
+                  ],
                 );
               },
             ),
