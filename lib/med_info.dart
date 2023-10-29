@@ -4,8 +4,9 @@ import 'package:intl/intl.dart'; // 导入日期格式化的库
 
 class MedPage extends StatefulWidget {
   final String title; // 接收所選列表的標題
+  final int id; // 新增一個用於接收 ID 的參數
 
-  const MedPage({required this.title, super.key});
+  const MedPage({required this.title, required this.id, super.key});
 
   @override
   State<MedPage> createState() => _MedPageState();
@@ -24,8 +25,9 @@ class _MedPageState extends State<MedPage> {
     // 打開資料庫連接
     await _databaseHelper.openConnection();
 
-    // 執行資料庫查詢，根據 widget.title 進行過濾
-    final data = await _databaseHelper.fetchMedDataByTitle(widget.title);
+    // 執行資料庫查詢，根據 widget.title 和 widget.id 進行過濾
+    final data =
+        await _databaseHelper.fetchMedDataByTitle(widget.title, widget.id);
 
     // 關閉資料庫連接
     await _databaseHelper.closeConnection();
@@ -37,7 +39,14 @@ class _MedPageState extends State<MedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title), // 使用所選清單的標題作為頁面標題
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ), // 使用所選清單的標題作為頁面標題
+        backgroundColor: Color(0xFF00FAE5),
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder(
         future: fetchData(),
@@ -46,10 +55,15 @@ class _MedPageState extends State<MedPage> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          } else if (!snapshot.hasData) {
             return const Center(child: Text('No data available'));
           } else {
             final data = snapshot.data;
+
+            // 检查数据是否为空或为 null，并相应处理
+            if (data == null || data.isEmpty) {
+              return const Center(child: Text('No data available'));
+            }
 
             return ListView.builder(
               itemCount: data!.length,
@@ -73,14 +87,14 @@ class _MedPageState extends State<MedPage> {
                     permitDateFormat.format(expiration_date);
 
                 return Card(
-                  color: Colors.blue[50], // 添加顏色
+                  color: Color.fromARGB(255, 179, 255, 249), // 添加顏色
                   margin: const EdgeInsets.all(8),
                   child: ListTile(
                     title: Text(
                       med_tw_name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
                       ),
                     ),
                     subtitle: Column(
@@ -88,7 +102,7 @@ class _MedPageState extends State<MedPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('英文名: $med_en_name',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -97,7 +111,7 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('類型: $med_type',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -106,7 +120,7 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('成分: $composition',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -115,7 +129,7 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('適應症: $indications',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -124,7 +138,7 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('使用方法: $how_to_use',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -133,7 +147,7 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('批准號: $permit_num',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -142,7 +156,7 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('批准類型: $permit_type',
                               style: const TextStyle(color: Colors.black87)),
                         ),
@@ -151,16 +165,16 @@ class _MedPageState extends State<MedPage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('批准日期: $formatpermit_date',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
                         const Divider(height: 1, color: Colors.grey), // 添加分隔线
-                        
+
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4.0), // 设置垂直内边距
+                              vertical: 6.0), // 设置垂直内边距
                           child: Text('過期日期: $formatexpiration_date',
                               style: const TextStyle(color: Colors.black87)),
                         ),
