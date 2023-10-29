@@ -39,7 +39,7 @@ class DatabaseHelper {
   // ];
 
   Future<List<Map<String, dynamic>>> fetchMedData() async {
-    final result = await _connection.query('SELECT * FROM med limit 60');
+    final result = await _connection.query('SELECT * FROM med ');
 
     for (final row in result) {
       final id = row[0];
@@ -51,14 +51,59 @@ class DatabaseHelper {
     return dataList.toList();
   }
 
-  Future<List<Map<String, dynamic>>> fetchMedDataByTitle(String title) async {
+  Future<List<Map<String, dynamic>>> fetchMedDataByTitle(
+      String title, int id) async {
     final result = await _connection.query(
-      'SELECT * FROM med WHERE med_tw_name = @title OR med_en_name = @title',
-      substitutionValues: {'title': title},
+      'SELECT * FROM med WHERE (med_tw_name = @title OR med_en_name = @title) AND id = @id',
+      substitutionValues: {'title': title, 'id': id},
     );
 
     return result.map((row) => row.toColumnMap()).toList();
   }
+
+Future<List<Map<String, dynamic>>> fetchNewsData() async {
+    final result = await _connection.query('SELECT * FROM news ');
+
+    for (final row in result) {
+      final id = row[0];
+      final name = row[1];
+      print('ID: $id, Name: $name');
+    }
+
+    final dataList = result.map((row) => row.toColumnMap());
+    return dataList.toList();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchNewsDataByTitle(String title, int id) async {
+  final result = await _connection.query(
+    'SELECT * FROM news WHERE title = @title AND id = @id',
+    substitutionValues: {'title': title, 'id': id},
+  );
+
+  return result.map((row) => row.toColumnMap()).toList();
+}
+
+Future<List<Map<String, dynamic>>> fetchRumorData() async {
+    final result = await _connection.query('SELECT * FROM clarification ');
+
+    for (final row in result) {
+      final id = row[0];
+      final name = row[1];
+      print('ID: $id, Name: $name');
+    }
+
+    final dataList = result.map((row) => row.toColumnMap());
+    return dataList.toList();
+  }
+
+Future<List<Map<String, dynamic>>> fetchRumorDataByTitle(String title, int id) async {
+  final result = await _connection.query(
+    'SELECT * FROM clarification WHERE title = @title AND id = @id',
+    substitutionValues: {'title': title, 'id': id},
+  );
+
+  return result.map((row) => row.toColumnMap()).toList();
+}
 
   // Add other database operation methods
   Future<List<Map<String, dynamic>>> fetchPharmacyData() async {
