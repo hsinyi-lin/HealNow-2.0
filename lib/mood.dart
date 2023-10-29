@@ -52,7 +52,7 @@ class _MoodPageState extends State<MoodPage> {
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Bearer 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',
+            'Bearer ',
       },
       body: json.encode({
         "model": "gpt-3.5-turbo",
