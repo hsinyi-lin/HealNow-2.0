@@ -41,12 +41,12 @@ class _RumorInfoPageState extends State<RumorInfoPage> {
       appBar: AppBar(
         title: Text(
           widget.title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
           ),
         ), // 使用所選清單的標題作為頁面標題
-        backgroundColor: Color(0xFFF9410E),
-        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: const Color(0xFFF9410E),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder(
         future: fetchData(),
@@ -71,14 +71,14 @@ class _RumorInfoPageState extends State<RumorInfoPage> {
                 final title = data[index]['title'];
                 final content = data[index]['content'];
                 // 在从数据库获取的内容中插入换行符
-                final content_typesetting = content.replaceAll(RegExp(r'\。'), '.\n\n');
+                final contentTypesetting = content.replaceAll(RegExp(r'\。'), '.\n\n');
                 final url = data[index]['url'];
                 final publishDate = data[index]['publish_date'];
                 final permitDateFormat = DateFormat('yyyy-MM-dd');
                 final formatpublishDate = permitDateFormat.format(publishDate);
 
                 return Card(
-                  color:Color.fromARGB(255, 248, 216, 183), // 添加顏色
+                  color:const Color.fromARGB(255, 248, 216, 183), // 添加顏色
                   margin: const EdgeInsets.all(8),
                   child: ListTile(
                     title: Text(
@@ -103,7 +103,7 @@ class _RumorInfoPageState extends State<RumorInfoPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0), // 设置垂直内边距
-                          child: Text(' $content_typesetting',
+                          child: Text(' $contentTypesetting',
                               style: const TextStyle(color: Colors.black87),
                               textAlign: TextAlign.justify),
                               ),
