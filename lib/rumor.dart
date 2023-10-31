@@ -1,17 +1,20 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'med_info.dart'; // 替換為你的詳細資訊頁面的引入
+import 'package:intl/intl.dart'; // 导入日期格式化的库
+
+import 'main.dart';
+import 'rumor_info.dart'; // 替換為你的詳細資訊頁面的引入
 import 'data/dbhelper.dart';
 
-class Myhome extends StatefulWidget {
-  const Myhome({super.key});
+class RumorPage extends StatefulWidget {
+  const RumorPage({super.key});
 
   @override
-  State<Myhome> createState() => _MyhomeState();
+  State<RumorPage> createState() => _RumorPageState();
 }
 
-class _MyhomeState extends State<Myhome> {
+class _RumorPageState extends State<RumorPage> {
   final TextEditingController _searchController = TextEditingController();
   late DatabaseHelper _databaseHelper;
   List<Map<String, dynamic>> _searchResults = [];
@@ -27,7 +30,7 @@ class _MyhomeState extends State<Myhome> {
   // 載入所有數據
   Future<void> _loadAllData() async {
     await _databaseHelper.openConnection();
-    final data = await _databaseHelper.fetchMedData();
+    final data = await _databaseHelper.fetchRumorData();
     await _databaseHelper.closeConnection();
 
     setState(() {
@@ -44,10 +47,7 @@ class _MyhomeState extends State<Myhome> {
       });
     } else {
       final results = _allData.where((item) =>
-          item['med_tw_name']
-              .toLowerCase()
-              .contains(searchTerm.toLowerCase()) ||
-          item['med_en_name'].toLowerCase().contains(searchTerm.toLowerCase()));
+          item['title'].toLowerCase().contains(searchTerm.toLowerCase()));
 
       setState(() {
         _searchResults = results.toList();
@@ -59,17 +59,16 @@ class _MyhomeState extends State<Myhome> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MedPage(title: itemTitle, id: itemId),
+        builder: (context) => RumorInfoPage(title: itemTitle, id: itemId),
       ),
     );
   }
 
-  // 从这个列表中选择随机图标
   final List<IconData> randomIcons = [
-    Icons.medical_services,
-    Icons.vaccines,
-    Icons.bloodtype,
-    Icons.healing
+    Icons.health_and_safety,
+    Icons.favorite_border,
+    Icons.favorite,
+    Icons.volunteer_activism
   ];
 
   // 获取随机图标的方法
@@ -82,8 +81,18 @@ class _MyhomeState extends State<Myhome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 179, 255, 249),
-      
+      backgroundColor: Color.fromARGB(255, 248, 216, 183),
+      appBar: AppBar(
+        title: const Text(
+          '健康闢謠',
+          style: TextStyle(
+            color: Colors.black,
+          ), // 设置字体颜色为黑色
+        ),
+        backgroundColor: Color(0xFFF9410E),
+        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+      ),
+      drawer: const AppDrawer(),
       body: Column(
         children: <Widget>[
           Padding(
@@ -106,27 +115,26 @@ class _MyhomeState extends State<Myhome> {
               itemCount: _searchResults.length,
               itemBuilder: (context, index) {
                 final id = _searchResults[index]['id'];
-                final medTwName = _searchResults[index]['med_tw_name'];
-                final medEnName = _searchResults[index]['med_en_name'];
+                final title = _searchResults[index]['title'];
+                final publishDate = _searchResults[index]['publish_date'];
+                final permitDateFormat = DateFormat('yyyy-MM-dd');
+                final formatpublishDate = permitDateFormat.format(publishDate);
 
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(getRandomIcon(),
-                          color: Color(0xFF1179FA)), // 使用随机图标
-                      title: Text('$medTwName'),
-                      subtitle: Text('$medEnName'),
-                      onTap: () {
-                        _navigateToDetailPage(medTwName, id);
-                      },
-                    ),
-                    const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.0), // 设置水平内边距
-                      child: Divider(height: 1, color: Colors.grey), // 添加分隔线
-                    ),
-                  ],
-                );
+                return Column(children: [
+                  ListTile(
+                    leading: Icon(getRandomIcon(),
+                        color: Color.fromARGB(255, 250, 95, 95)), // 使用随机图标
+                    title: Text('$title'),
+                    subtitle: Text(formatpublishDate),
+                    onTap: () {
+                      _navigateToDetailPage(title, id);
+                    },
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0), // 设置水平内边距
+                    child: Divider(height: 1, color: Colors.grey), // 添加分隔线
+                  ),
+                ]);
               },
             ),
           ),

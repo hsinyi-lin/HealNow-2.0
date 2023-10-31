@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'map.dart';
 import 'mood.dart';
+import 'news.dart';
+import 'rumor.dart';
 
 void main() {
   runApp(
@@ -19,7 +21,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('App Title'),
+        title: const Text(
+          'HealNow',
+          style: TextStyle(
+            color: Colors.black,
+          ), // 设置字体颜色为黑色
+        ),
+        backgroundColor: Color(0xFF00FAE5),
+        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
       body: const Myhome(), // 將首頁視圖添加到主頁面
       drawer: const AppDrawer(), // 使用全局抽屜
@@ -32,7 +41,8 @@ class AppDrawer extends StatelessWidget {
 
   void navigateToPage(BuildContext context, Widget page) {
     Navigator.pop(context); // 關閉抽屜
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => page));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => page));
   }
 
   @override
@@ -40,7 +50,17 @@ class AppDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
+          // const UserAccountsDrawerHeader(
+          //   accountName: Text(''),
+          //   accountEmail: Text(''),
+
+          //   margin: EdgeInsets.only(bottom: 1), // 仅调整底部外边距
+          //   decoration: BoxDecoration(
+          //     color: Colors.white, // 设置背景颜色为0xFF00BEFA
+          //   ),
+          // ),
           ListTile(
+            leading: Icon(Icons.home, color: Color(0xFF00FAE5)), // 主页图标
             title: const Text('首頁'),
             onTap: () {
               Navigator.pop(context);
@@ -54,18 +74,32 @@ class AppDrawer extends StatelessWidget {
             // },
           ),
           ListTile(
-            title: const Text('闢謠專區'),
+            leading: const Icon(Icons.volunteer_activism,
+                color: Color(0xFFF9410E)), // 图标
+            title: const Text('健康闢謠'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const RumorPage()),
+              );
             },
           ),
           ListTile(
-            title: const Text('身體安全的新聞'),
+            leading:
+                const Icon(Icons.newspaper, color: Color(0xFF1179FA)), // 图标
+            title: const Text('食藥新聞'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const NewsPage()),
+              );
             },
           ),
           ListTile(
+            leading: const Icon(Icons.map,
+                color: Color.fromARGB(255, 91, 17, 250)), // 图标
             title: const Text('藥局地圖'),
             onTap: () {
               Navigator.pop(context);
@@ -76,6 +110,8 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.mood,
+                color: Color.fromARGB(255, 227, 17, 250)), // 图标
             title: const Text('記錄心情'),
             onTap: () {
               Navigator.pop(context);

@@ -52,7 +52,7 @@ class _MoodPageState extends State<MoodPage> {
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Bearer openai_key',
+            'Bearer ',
       },
       body: json.encode({
         "model": "gpt-3.5-turbo",
@@ -92,8 +92,16 @@ class _MoodPageState extends State<MoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 233, 183, 248), // 10% 的透明度
       appBar: AppBar(
-        title: const Text("記錄心情"),
+        title: const Text(
+          '記錄心情',
+          style: TextStyle(
+            color: Colors.black,
+          ), // 设置字体颜色为黑色
+        ),
+        backgroundColor:Color.fromARGB(255, 186, 4, 252),
+        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
       drawer: const AppDrawer(),
       body: FutureBuilder<List<Map<String, dynamic>>?>(
@@ -120,7 +128,8 @@ class _MoodPageState extends State<MoodPage> {
       // 用於新增按鈕
       floatingActionButton: FloatingActionButton(
         onPressed: _showMoodInput,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add,color: Color.fromARGB(255, 231, 145, 252)),
+        backgroundColor:Color.fromARGB(255, 197, 22, 255) ,
       ),
     );
   }
@@ -204,6 +213,9 @@ class _MoodPageState extends State<MoodPage> {
                       Navigator.of(context).pop();
                       addMoodData(moodTextController.text);
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple, // 设置按钮颜色为紫色
+                    ),
                     child: const Text('確認'),
                   ),
                 ],
