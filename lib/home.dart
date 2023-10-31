@@ -82,7 +82,7 @@ class _MyhomeState extends State<Myhome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 179, 255, 249),
+      backgroundColor: const Color.fromARGB(255, 179, 255, 249),
       
       body: Column(
         children: <Widget>[
@@ -113,7 +113,7 @@ class _MyhomeState extends State<Myhome> {
                   children: [
                     ListTile(
                       leading: Icon(getRandomIcon(),
-                          color: Color(0xFF1179FA)), // 使用随机图标
+                          color: const Color(0xFF1179FA)), // 使用随机图标
                       title: Text('$medTwName'),
                       subtitle: Text('$medEnName'),
                       onTap: () {
