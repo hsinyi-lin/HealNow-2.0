@@ -81,14 +81,16 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 183, 222, 248), // 10% 的透明度
+      backgroundColor: Color.fromARGB(255, 230, 243, 251), 
       appBar: AppBar(
         title: const Text(
           '食藥新聞',
           style: TextStyle(
             color: Colors.black,
+            fontWeight: FontWeight.bold, // 设置字体加粗
           ), // 设置字体颜色为黑色
         ),
+        backgroundColor: Color.fromARGB(255, 94, 190, 250), // 10% 的透明度
         iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
 

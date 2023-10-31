@@ -20,7 +20,8 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    _databaseHelper = DatabaseHelper(createDatabaseConnection()); // 初始化 _databaseHelper
+    _databaseHelper =
+        DatabaseHelper(createDatabaseConnection()); // 初始化 _databaseHelper
   }
 
   Future<List<Map<String, dynamic>>?> fetchDataFromPostgreSQL() async {
@@ -34,16 +35,19 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("藥局地圖"),
+        title: const Text(
+          "藥局地圖",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold, // 设置字体加粗
+          ),
+        ),
         // Set your header title here
       ),
       drawer: const AppDrawer(),
       body: GoogleMap(
         initialCameraPosition:
-            const CameraPosition(
-              target: currentLocation, 
-              zoom: 15
-        ),
+            const CameraPosition(target: currentLocation, zoom: 15),
         onMapCreated: (GoogleMapController controller) {
           _mapController = controller;
           _addMarkers();
@@ -79,7 +83,7 @@ class _MapPageState extends State<MapPage> {
 
         var marker = Marker(
           markerId: MarkerId(data["id"].toString()),
-          position:  LatLng(latitude, longitude),
+          position: LatLng(latitude, longitude),
           infoWindow: InfoWindow(
             title: data["pharmacy_name"],
             onTap: () {

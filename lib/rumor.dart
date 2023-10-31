@@ -87,6 +87,7 @@ class _RumorPageState extends State<RumorPage> {
           '健康闢謠',
           style: TextStyle(
             color: Colors.black,
+            fontWeight: FontWeight.bold, // 设置字体加粗
           ), // 设置字体颜色为黑色
         ),
         backgroundColor: Color(0xFFF9410E),
