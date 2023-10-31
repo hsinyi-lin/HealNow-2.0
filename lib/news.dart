@@ -81,7 +81,7 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 183, 222, 248), // 10% 的透明度
+      backgroundColor: const Color.fromARGB(255, 183, 222, 248), // 10% 的透明度
       appBar: AppBar(
         title: const Text(
           '食藥新聞',
@@ -89,7 +89,7 @@ class _NewsPageState extends State<NewsPage> {
             color: Colors.black,
           ), // 设置字体颜色为黑色
         ),
-        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
 
       drawer: const AppDrawer(),
@@ -123,7 +123,7 @@ class _NewsPageState extends State<NewsPage> {
                 return Column(children: [
                   ListTile(
                     leading: Icon(getRandomIcon(),
-                        color: Color.fromARGB(255, 22, 50, 255)), // 使用随机图标
+                        color: const Color.fromARGB(255, 22, 50, 255)), // 使用随机图标
                     title: Text('$title'),
                     subtitle: Text(formatpublishDate),
                     onTap: () {
