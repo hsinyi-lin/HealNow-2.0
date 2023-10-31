@@ -92,16 +92,17 @@ class _MoodPageState extends State<MoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 233, 183, 248), // 10% 的透明度
+      backgroundColor: Color.fromARGB(255, 252, 240, 255), // 10% 的透明度
       appBar: AppBar(
         title: const Text(
           '記錄心情',
           style: TextStyle(
             color: Colors.black,
+            fontWeight: FontWeight.bold, // 设置字体加粗
           ), // 设置字体颜色为黑色
         ),
-        backgroundColor:const Color.fromARGB(255, 186, 4, 252),
-        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        backgroundColor:Color.fromARGB(255, 216, 108, 255),
+        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
       drawer: const AppDrawer(),
       body: FutureBuilder<List<Map<String, dynamic>>?>(
@@ -128,8 +129,8 @@ class _MoodPageState extends State<MoodPage> {
       // 用於新增按鈕
       floatingActionButton: FloatingActionButton(
         onPressed: _showMoodInput,
-        child: const Icon(Icons.add,color: Color.fromARGB(255, 231, 145, 252)),
-        backgroundColor:const Color.fromARGB(255, 197, 22, 255) ,
+        child: const Icon(Icons.add,color: Color.fromARGB(255, 255,255, 255)),
+        backgroundColor:Color.fromARGB(255, 216, 108, 255) ,
       ),
     );
   }

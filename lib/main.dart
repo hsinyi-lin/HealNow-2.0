@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
             color: Colors.black,
           ), // 设置字体颜色为黑色
         ),
-        backgroundColor: const Color(0xFF00FAE5),
-        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        backgroundColor: Color.fromARGB(204, 12, 248, 228),
+        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
       body: const Myhome(), // 將首頁視圖添加到主頁面
       drawer: const AppDrawer(), // 使用全局抽屜
