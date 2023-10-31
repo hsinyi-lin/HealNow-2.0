@@ -112,7 +112,7 @@ class _MyhomeState extends State<Myhome> {
                   children: [
                     ListTile(
                       leading: Icon(getRandomIcon(),
-                          color: Color(0xFF1179FA)), // 使用随机图标
+                          color: const Color(0xFF1179FA)), // 使用随机图标
                       title: Text('$medTwName'),
                       subtitle: Text('$medEnName'),
                       onTap: () {

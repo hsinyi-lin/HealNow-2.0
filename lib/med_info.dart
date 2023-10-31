@@ -41,12 +41,12 @@ class _MedPageState extends State<MedPage> {
       appBar: AppBar(
         title: Text(
           widget.title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
           ),
         ), // 使用所選清單的標題作為頁面標題
-        backgroundColor: Color(0xFF00FAE5),
-        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: const Color(0xFF00FAE5),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder(
         future: fetchData(),
@@ -68,30 +68,30 @@ class _MedPageState extends State<MedPage> {
             return ListView.builder(
               itemCount: data!.length,
               itemBuilder: (context, index) {
-                final med_tw_name = data[index]['med_tw_name'];
-                final med_en_name = data[index]['med_en_name'];
-                final med_type = data[index]['med_type'];
+                final medTwName = data[index]['med_tw_name'];
+                final medEnName = data[index]['med_en_name'];
+                final medType = data[index]['med_type'];
                 final composition = data[index]['composition'];
                 final indications = data[index]['indications'];
-                final how_to_use = data[index]['how_to_use'];
-                final permit_num = data[index]['permit_num'];
-                final permit_type = data[index]['permit_type'];
+                final howToUse = data[index]['how_to_use'];
+                final permitNum = data[index]['permit_num'];
+                final permitType = data[index]['permit_type'];
                 // 获取从数据库中获取的 DateTime 对象
-                final permit_date = data[index]['permit_date'];
-                final expiration_date = data[index]['expiration_date'];
+                final permitDate = data[index]['permit_date'];
+                final expirationDate = data[index]['expiration_date'];
 
                 // 将 DateTime 对象格式化为字符串
                 final permitDateFormat = DateFormat('yyyy-MM-dd');
-                final formatpermit_date = permitDateFormat.format(permit_date);
-                final formatexpiration_date =
-                    permitDateFormat.format(expiration_date);
+                final formatpermitDate = permitDateFormat.format(permitDate);
+                final formatExpirationDate =
+                    permitDateFormat.format(expirationDate);
 
                 return Card(
-                  color: Color.fromARGB(255, 179, 255, 249), // 添加顏色
+                  color: const Color.fromARGB(255, 179, 255, 249), // 添加顏色
                   margin: const EdgeInsets.all(8),
                   child: ListTile(
                     title: Text(
-                      med_tw_name,
+                      medTwName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -103,7 +103,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('英文名: $med_en_name',
+                          child: Text('英文名: $medEnName',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
@@ -112,7 +112,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('類型: $med_type',
+                          child: Text('類型: $medType',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
@@ -139,7 +139,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('使用方法: $how_to_use',
+                          child: Text('使用方法: $howToUse',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
@@ -148,7 +148,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('批准號: $permit_num',
+                          child: Text('批准號: $permitNum',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
@@ -157,7 +157,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('批准類型: $permit_type',
+                          child: Text('批准類型: $permitType',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
@@ -166,7 +166,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('批准日期: $formatpermit_date',
+                          child: Text('批准日期: $formatpermitDate',
                               style: const TextStyle(color: Colors.black87)),
                         ),
 
@@ -175,7 +175,7 @@ class _MedPageState extends State<MedPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 6.0), // 设置垂直内边距
-                          child: Text('過期日期: $formatexpiration_date',
+                          child: Text('過期日期: $formatExpirationDate',
                               style: const TextStyle(color: Colors.black87)),
                         ),
                       ],

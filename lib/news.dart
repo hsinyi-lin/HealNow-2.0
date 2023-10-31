@@ -125,7 +125,7 @@ class _NewsPageState extends State<NewsPage> {
                 return Column(children: [
                   ListTile(
                     leading: Icon(getRandomIcon(),
-                        color: Color.fromARGB(255, 22, 50, 255)), // 使用随机图标
+                        color: const Color.fromARGB(255, 22, 50, 255)), // 使用随机图标
                     title: Text('$title'),
                     subtitle: Text(formatpublishDate),
                     onTap: () {

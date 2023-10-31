@@ -81,7 +81,7 @@ class _RumorPageState extends State<RumorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 248, 216, 183),
+      backgroundColor: const Color.fromARGB(255, 248, 216, 183),
       appBar: AppBar(
         title: const Text(
           '健康闢謠',
@@ -90,8 +90,8 @@ class _RumorPageState extends State<RumorPage> {
             fontWeight: FontWeight.bold, // 设置字体加粗
           ), // 设置字体颜色为黑色
         ),
-        backgroundColor: Color(0xFFF9410E),
-        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        backgroundColor: const Color(0xFFF9410E),
+        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
       drawer: const AppDrawer(),
       body: Column(
@@ -124,7 +124,7 @@ class _RumorPageState extends State<RumorPage> {
                 return Column(children: [
                   ListTile(
                     leading: Icon(getRandomIcon(),
-                        color: Color.fromARGB(255, 250, 95, 95)), // 使用随机图标
+                        color: const Color.fromARGB(255, 250, 95, 95)), // 使用随机图标
                     title: Text('$title'),
                     subtitle: Text(formatpublishDate),
                     onTap: () {
