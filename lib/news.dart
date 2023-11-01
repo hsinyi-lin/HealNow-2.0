@@ -27,6 +27,12 @@ class _NewsPageState extends State<NewsPage> {
     _loadAllData(); // 初始化時載入所有資料
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   // 載入所有數據
   Future<void> _loadAllData() async {
     await _databaseHelper.openConnection();
@@ -81,7 +87,7 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 230, 243, 251), 
+      backgroundColor: const Color.fromARGB(255, 230, 243, 251), 
       appBar: AppBar(
         title: const Text(
           '食藥新聞',
@@ -90,8 +96,8 @@ class _NewsPageState extends State<NewsPage> {
             fontWeight: FontWeight.bold, // 设置字体加粗
           ), // 设置字体颜色为黑色
         ),
-        backgroundColor: Color.fromARGB(255, 94, 190, 250), // 10% 的透明度
-        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        backgroundColor: const Color.fromARGB(255, 94, 190, 250), // 10% 的透明度
+        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
 
       drawer: const AppDrawer(),

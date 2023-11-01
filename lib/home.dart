@@ -24,6 +24,13 @@ class _MyhomeState extends State<Myhome> {
     _loadAllData(); // 初始化時載入所有資料
   }
 
+  // 用於執行資源釋放，dispose 是 State 的生命周期方法之一
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   // 載入所有數據
   Future<void> _loadAllData() async {
     await _databaseHelper.openConnection();
@@ -82,7 +89,7 @@ class _MyhomeState extends State<Myhome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 231, 247, 246),
+      backgroundColor:const Color.fromARGB(255, 231, 247, 246),
       body: Column(
         children: <Widget>[
           Padding(

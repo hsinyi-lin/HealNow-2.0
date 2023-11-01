@@ -32,6 +32,13 @@ class _MoodPageState extends State<MoodPage> {
     getAllMoodData();
   }
 
+  @override
+  void dispose() {
+    moodTextController.dispose();
+    moodTextFocus.dispose();
+    super.dispose();
+  }
+
   // 取得情緒資料函式
   Future<List<Map<String, dynamic>>?> getAllMoodData() async {
     final dbHelper = SQLiteDatabaseHelper();
@@ -51,8 +58,7 @@ class _MoodPageState extends State<MoodPage> {
       Uri.parse(apiUrl),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer ',
+        'Authorization': 'Bearer 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',
       },
       body: json.encode({
         "model": "gpt-3.5-turbo",
@@ -68,7 +74,7 @@ class _MoodPageState extends State<MoodPage> {
       final result = json.decode(response.body);
       print(result);
       String aiReply = result['choices'][0]['message']['content'];
-
+    
       print(aiReply);
       final dbHelper = SQLiteDatabaseHelper();
       final data = {
@@ -92,7 +98,7 @@ class _MoodPageState extends State<MoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 252, 240, 255), // 10% 的透明度
+      backgroundColor: const Color.fromARGB(255, 252, 240, 255), // 10% 的透明度
       appBar: AppBar(
         title: const Text(
           '記錄心情',
@@ -101,8 +107,8 @@ class _MoodPageState extends State<MoodPage> {
             fontWeight: FontWeight.bold, // 设置字体加粗
           ), // 设置字体颜色为黑色
         ),
-        backgroundColor:Color.fromARGB(255, 216, 108, 255),
-        iconTheme: IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        backgroundColor: const Color.fromARGB(255, 216, 108, 255),
+        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
       ),
       drawer: const AppDrawer(),
       body: FutureBuilder<List<Map<String, dynamic>>?>(
@@ -129,8 +135,8 @@ class _MoodPageState extends State<MoodPage> {
       // 用於新增按鈕
       floatingActionButton: FloatingActionButton(
         onPressed: _showMoodInput,
-        child: const Icon(Icons.add,color: Color.fromARGB(255, 255,255, 255)),
-        backgroundColor:Color.fromARGB(255, 216, 108, 255) ,
+        backgroundColor: const Color.fromARGB(255, 216, 108, 255),
+        child: const Icon(Icons.add, color: Color.fromARGB(255, 255, 255, 255)),
       ),
     );
   }
@@ -212,6 +218,7 @@ class _MoodPageState extends State<MoodPage> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
+                      print(moodTextController.text);
                       addMoodData(moodTextController.text);
                     },
                     style: ElevatedButton.styleFrom(
@@ -226,12 +233,5 @@ class _MoodPageState extends State<MoodPage> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    moodTextController.dispose();
-    moodTextFocus.dispose();
-    super.dispose();
   }
 }

@@ -27,6 +27,12 @@ class _RumorPageState extends State<RumorPage> {
     _loadAllData(); // 初始化時載入所有資料
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   // 載入所有數據
   Future<void> _loadAllData() async {
     await _databaseHelper.openConnection();
