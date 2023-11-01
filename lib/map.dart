@@ -39,7 +39,7 @@ class _MapPageState extends State<MapPage> {
           "藥局地圖",
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold, // 设置字体加粗
+            fontWeight: FontWeight.bold, // 設置字體加粗
           ),
         ),
         // Set your header title here
