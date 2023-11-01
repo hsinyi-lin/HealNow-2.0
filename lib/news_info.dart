@@ -39,12 +39,12 @@ class _NewsInfoPageState extends State<NewsInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.title,
-          style: const TextStyle(
+        title: const Text(
+          "內容",
+          style: TextStyle(
             color: Colors.black,
           ),
-        ), // 使用所選清單的標題作為頁面標題
+        ), 
         backgroundColor: const Color(0xFF1179FA),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
