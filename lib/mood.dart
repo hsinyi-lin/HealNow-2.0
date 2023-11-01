@@ -58,7 +58,7 @@ class _MoodPageState extends State<MoodPage> {
       Uri.parse(apiUrl),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer',
       },
       body: json.encode({
         "model": "gpt-3.5-turbo",
@@ -153,9 +153,11 @@ class _MoodPageState extends State<MoodPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item['updated_at'],
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  item['updated_at'],
+                  style: const TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold)
+                ),
                 const SizedBox(height: 5),
                 Text(item['content']),
               ],
