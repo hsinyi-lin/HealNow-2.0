@@ -1,10 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // 導入日期格式化的庫
+import 'package:intl/intl.dart';
 
 import 'main.dart';
-import 'news_info.dart'; // 替換為你的詳細資訊頁面的引入
+import 'news_info.dart';
 import 'data/dbhelper.dart';
 
 class NewsPage extends StatefulWidget {
@@ -19,6 +18,7 @@ class _NewsPageState extends State<NewsPage> {
   late DatabaseHelper _databaseHelper;
   List<Map<String, dynamic>> _searchResults = [];
   List<Map<String, dynamic>> _allData = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -44,6 +44,7 @@ class _NewsPageState extends State<NewsPage> {
     setState(() {
       _allData = data;
       _searchResults = data;
+      isLoading = false;
     });
   }
 
@@ -95,11 +96,11 @@ class _NewsPageState extends State<NewsPage> {
           '食藥新聞',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold, // 設置字體加粗
-          ), // 設置字體顏色為黑色
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: const Color.fromARGB(255, 94, 190, 250), 
-        iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
+        backgroundColor: const Color.fromARGB(255, 94, 190, 250),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       drawer: const AppDrawer(),
       body: Column(
@@ -120,33 +121,36 @@ class _NewsPageState extends State<NewsPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _searchResults.length,
-              itemBuilder: (context, index) {
-                final id = _searchResults[index]['id'];
-                final title = _searchResults[index]['title'];
-                final publishDate = _searchResults[index]['publish_date'];
-                final permitDateFormat = DateFormat('yyyy-MM-dd');
-                final formatpublishDate = permitDateFormat.format(publishDate);
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final id = _searchResults[index]['id'];
+                      final title = _searchResults[index]['title'];
+                      final publishDate = _searchResults[index]['publish_date'];
+                      final permitDateFormat = DateFormat('yyyy-MM-dd');
+                      final formatpublishDate = permitDateFormat.format(publishDate);
 
-                return Column(children: [
-                  ListTile(
-                    leading: Icon(getRandomIcon(),
-                        color:
-                            const Color.fromARGB(255, 22, 50, 255)), // 使用隨機圖示
-                    title: Text('$title'),
-                    subtitle: Text(formatpublishDate),
-                    onTap: () {
-                      _navigateToDetailPage(title, id);
+                      return Column(children: [
+                        ListTile(
+                          leading: Icon(getRandomIcon(),
+                              color: const Color.fromARGB(255, 22, 50, 255)),
+                          title: Text('$title'),
+                          subtitle: Text(formatpublishDate),
+                          onTap: () {
+                            _navigateToDetailPage(title, id);
+                          },
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Divider(height: 1, color: Colors.grey),
+                        ),
+                      ]);
                     },
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0), // 設置水準內邊距
-                    child: Divider(height: 1, color: Colors.grey), // 添加分隔線
-                  ),
-                ]);
-              },
-            ),
           ),
         ],
       ),
