@@ -48,10 +48,8 @@ class SQLiteDatabaseHelper {
       CREATE TABLE mood (
         id INTEGER PRIMARY KEY,
         content TEXT,
-        mood_id INTEGER,
         ai_reply TEXT,
-        created_at DATETIME,
-        updated_at DATETIME
+        created_at DATETIME
       )
     ''');
   }
@@ -59,16 +57,12 @@ class SQLiteDatabaseHelper {
   // 新增資料
   Future<int> insertData(Map<String, dynamic> data) async {
     var dbClient = await db;
-
-    // 增加 8 小時到 'created_at' 和 'updated_at' 欄位
+    
     final now = DateTime.now();
     final eightHoursLater = now.add(const Duration(hours: 8));
     print(eightHoursLater);
 
-    data['created_at'] =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
-    data['updated_at'] =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
+    data['created_at'] = DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
 
     return await dbClient.insert('mood', data);
   }
