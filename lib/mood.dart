@@ -57,10 +57,10 @@ class _MoodPageState extends State<MoodPage> {
         'Authorization': 'Bearer ',
       },
       body: json.encode({
-        "model": "gpt-3.5-turbo",
-        "messages": [
-          {"role": "system", "content": "你是一位會用一句話給予鼓勵的心理諮商師"},
-          {"role": "user", "content": content}
+        'model': 'gpt-3.5-turbo',
+        'messages': [
+          {'role': 'system', 'content': '你是一位會用一句話給予鼓勵的心理諮商師'},
+          {'role': 'user', 'content': content}
         ]
       }),
     );
