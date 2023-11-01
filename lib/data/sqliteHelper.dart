@@ -11,11 +11,11 @@ class SQLiteDatabaseHelper {
 
   // 私有的靜態資料庫實體
   static Database? _db;
-  
+
   // 用於訪問資料庫
   Future<Database> get db async {
     if (_db != null) {
-      return _db!;  // ! 用於確保不是null
+      return _db!; // ! 用於確保不是null
     }
     _db = await initDb();
     return _db!;
@@ -23,7 +23,7 @@ class SQLiteDatabaseHelper {
 
   // 此internal是為了外部使用，當外部使用SQLiteDatabaseHelper()，實際上是在調用factory函式
   SQLiteDatabaseHelper.internal();
-  
+
   // 資料庫初始化
   Future<Database> initDb() async {
     String databasesPath = await getDatabasesPath();
@@ -63,22 +63,14 @@ class SQLiteDatabaseHelper {
     // 增加 8 小時到 'created_at' 和 'updated_at' 欄位
     final now = DateTime.now();
     final eightHoursLater = now.add(const Duration(hours: 8));
+    print(eightHoursLater);
 
-    data['created_at'] = DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
-    data['updated_at'] = DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
+    data['created_at'] =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
+    data['updated_at'] =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
 
     return await dbClient.insert('mood', data);
-  }
-
-  // 編輯資料
-  Future<int> updateData(Map<String, dynamic> data) async {
-    var dbClient = await db;
-    return await dbClient.update(
-      'mood',
-      data,
-      where: 'id = ?',
-      whereArgs: [data['id']],
-    );
   }
 
   // 取得所有資料
