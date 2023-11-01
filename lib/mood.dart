@@ -98,17 +98,17 @@ class _MoodPageState extends State<MoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 252, 240, 255), // 10% 的透明度
+      backgroundColor: const Color.fromARGB(255, 252, 240, 255), 
       appBar: AppBar(
         title: const Text(
           '記錄心情',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold, // 设置字体加粗
-          ), // 设置字体颜色为黑色
+            fontWeight: FontWeight.bold, // 設置字體加粗
+          ), // 設置字體顏色為黑色
         ),
         backgroundColor: const Color.fromARGB(255, 216, 108, 255),
-        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
       ),
       drawer: const AppDrawer(),
       body: FutureBuilder<List<Map<String, dynamic>>?>(
@@ -119,7 +119,7 @@ class _MoodPageState extends State<MoodPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}')); //用於錯誤訊息
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('没有資料'));
+            return const Center(child: Text('沒有資料'));
           } else {
             final data = snapshot.data!;
             return ListView.builder(
@@ -224,7 +224,7 @@ class _MoodPageState extends State<MoodPage> {
                       addMoodData(moodTextController.text);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple, // 设置按钮颜色为紫色
+                      backgroundColor: Colors.purple, // 設置按鈕顏色為紫色
                     ),
                     child: const Text('確認'),
                   ),

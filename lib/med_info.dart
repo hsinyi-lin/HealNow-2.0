@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'data/dbhelper.dart';
-import 'package:intl/intl.dart'; // 导入日期格式化的库
+import 'package:intl/intl.dart'; // 導入日期格式化的庫
 
 class MedPage extends StatefulWidget {
   final String title; // 接收所選列表的標題
@@ -60,7 +60,7 @@ class _MedPageState extends State<MedPage> {
           } else {
             final data = snapshot.data;
 
-            // 检查数据是否为空或为 null，并相应处理
+            // 檢查資料是否為空或為 null，並相應處理
             if (data == null || data.isEmpty) {
               return const Center(child: Text('No data available'));
             }
@@ -76,25 +76,25 @@ class _MedPageState extends State<MedPage> {
                 final howToUse = data[index]['how_to_use'];
                 final permitNum = data[index]['permit_num'];
                 final permitType = data[index]['permit_type'];
-                // 获取从数据库中获取的 DateTime 对象
+
+                // 獲取從資料庫中獲取的 DateTime 物件
                 final permitDate = data[index]['permit_date'];
                 final expirationDate = data[index]['expiration_date'];
 
-                // 将 DateTime 对象格式化为字符串
+                // 將 DateTime 物件格式化為字串
                 final permitDateFormat = DateFormat('yyyy-MM-dd');
                 final formatpermitDate = permitDateFormat.format(permitDate);
                 final formatExpirationDate =
                     permitDateFormat.format(expirationDate);
 
-                return Card(
-                  color: const Color.fromARGB(255, 179, 255, 249), // 添加顏色
-                  margin: const EdgeInsets.all(8),
+                return Container(
+                  margin: const EdgeInsets.all(15),
                   child: ListTile(
                     title: Text(
                       medTwName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 25,
                       ),
                     ),
                     subtitle: Column(
@@ -102,87 +102,93 @@ class _MedPageState extends State<MedPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('英文名: $medEnName',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('類型: $medType',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('成分: $composition',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('適應症: $indications',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('使用方法: $howToUse',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('批准號: $permitNum',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('批准類型: $permitType',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('批准日期: $formatpermitDate',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 10.0), // 設置垂直內邊距
                           child: Text('過期日期: $formatExpirationDate',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
                       ],
                     ),
-                    onTap: () {
-                      // 點擊列表項的操作
-                    },
                   ),
                 );
               },
