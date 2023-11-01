@@ -36,7 +36,7 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "藥局地圖",
+          '藥局地圖',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold, // 設置字體加粗
@@ -67,14 +67,14 @@ class _MapPageState extends State<MapPage> {
             const ImageConfiguration(), 'assets/images/drugstore.png');
         // print(data);
 
-        var latitude = double.parse(data["latitude"].toString());
-        var longitude = double.parse(data["longitude"].toString());
+        var latitude = double.parse(data['latitude'].toString());
+        var longitude = double.parse(data['longitude'].toString());
 
         var marker = Marker(
-          markerId: MarkerId(data["id"].toString()),
+          markerId: MarkerId(data['id'].toString()),
           position: LatLng(latitude, longitude),
           infoWindow: InfoWindow(
-            title: data["pharmacy_name"],
+            title: data['pharmacy_name'],
             onTap: () {
               _showCustomInfoWindow(context, data);
             },
@@ -82,7 +82,7 @@ class _MapPageState extends State<MapPage> {
           icon: markerIcon,
         );
 
-        _markers[data["id"].toString()] = marker;
+        _markers[data['id'].toString()] = marker;
       }
     }
 
@@ -104,14 +104,14 @@ class _MapPageState extends State<MapPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data["pharmacy_name"],
+                  data['pharmacy_name'],
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text('業者: ${data["leader_name"]}'),
-                Text('電話: ${data["phone"]}'),
-                Text('地址: ${data["full_address"]}'),
+                Text('業者: ${data['leader_name']}'),
+                Text('電話: ${data['phone']}'),
+                Text('地址: ${data['full_address']}'),
               ],
             ),
           ),

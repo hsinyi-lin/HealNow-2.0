@@ -99,7 +99,7 @@ class _RumorPageState extends State<RumorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 248, 216, 183), // 設置背景顏色
+      backgroundColor: const Color.fromARGB(255, 251, 237, 225), // 設置背景顏色
       appBar: AppBar(
         title: const Text(
           '健康闢謠', // 設置標題文本

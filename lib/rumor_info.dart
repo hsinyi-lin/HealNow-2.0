@@ -42,7 +42,7 @@ class _RumorInfoPageState extends State<RumorInfoPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "內容",
+          '內容',
           style: TextStyle(
             color: Colors.black,
           ),
@@ -60,7 +60,7 @@ class _RumorInfoPageState extends State<RumorInfoPage> {
             // 檢查是否有錯誤發生，如果是，則顯示錯誤消息。
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData) {
-            // 檢查是否有資料可用，如果沒有，則顯示"無可用資料"的消息。
+            // 檢查是否有資料可用，如果沒有，則顯示'無可用資料'的消息。
             return const Center(child: Text('No data available'));
           } else {
             final data =

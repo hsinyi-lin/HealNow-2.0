@@ -40,7 +40,7 @@ class _NewsInfoPageState extends State<NewsInfoPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "內容",
+          '內容',
           style: TextStyle(
             color: Colors.black,
           ),
@@ -55,7 +55,7 @@ class _NewsInfoPageState extends State<NewsInfoPage> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {//檢查是否有錯誤發生，如果是，則顯示錯誤消息。
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {//檢查是否有資料可用，如果沒有，則顯示"無可用資料"的消息。
+          } else if (!snapshot.hasData) {//檢查是否有資料可用，如果沒有，則顯示'無可用資料'的消息。
             return const Center(child: Text('No data available'));
           } else {
             final data = snapshot.data;//如果非同步作業成功並且有資料可用，那麼可以通過 snapshot.data 訪問返回的資料。
