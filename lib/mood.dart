@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -53,8 +52,9 @@ class _MoodPageState extends State<MoodPage> {
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer',
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept-Charset': 'UTF-8',
+        'Authorization': 'Bearer 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',
       },
       body: json.encode({
         "model": "gpt-3.5-turbo",
@@ -67,7 +67,7 @@ class _MoodPageState extends State<MoodPage> {
 
     // 處理呼叫後資料，並且正式新增
     if (response.statusCode == 200) {
-      final result = json.decode(response.body);
+      final result = json.decode(utf8.decode(response.bodyBytes));
       print(result);
       String aiReply = result['choices'][0]['message']['content'];
     
@@ -90,7 +90,7 @@ class _MoodPageState extends State<MoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 252, 240, 255), 
+      backgroundColor: const Color.fromARGB(255, 252, 252, 244),
       appBar: AppBar(
         title: const Text(
           '記錄心情',
@@ -99,7 +99,7 @@ class _MoodPageState extends State<MoodPage> {
             fontWeight: FontWeight.bold, // 設置字體加粗
           ), // 設置字體顏色為黑色
         ),
-        backgroundColor: const Color.fromARGB(255, 216, 108, 255),
+        backgroundColor: const Color.fromARGB(255, 232, 239, 139),
         iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
       ),
       drawer: const AppDrawer(),
@@ -127,7 +127,7 @@ class _MoodPageState extends State<MoodPage> {
       // 用於新增按鈕
       floatingActionButton: FloatingActionButton(
         onPressed: _showMoodInput,
-        backgroundColor: const Color.fromARGB(255, 216, 108, 255),
+        backgroundColor: const Color.fromARGB(255, 186, 195, 89),
         child: const Icon(Icons.add, color: Color.fromARGB(255, 255, 255, 255)),
       ),
     );
@@ -140,7 +140,7 @@ class _MoodPageState extends State<MoodPage> {
       margin: const EdgeInsets.all(10),
       elevation: 3,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0), // 调整半径以设置合适的圆角值
+        borderRadius: BorderRadius.circular(10.0),
       ),
       child: Column(
         children: <Widget>[
@@ -148,10 +148,14 @@ class _MoodPageState extends State<MoodPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 5),
                 Text(
                   item['created_at'],
                   style: const TextStyle(
-                  fontSize: 20)
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 66, 66, 66),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 Text(item['content']),
@@ -172,11 +176,17 @@ class _MoodPageState extends State<MoodPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('AI心理師',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text(
+                  'AI心理師',
+                  style:TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 66, 66, 66),
+                  ),
+                ),
                 const SizedBox(height: 5),
                 Text(item['ai_reply']),
+                const SizedBox(height: 5),
               ],
             ),
           ),
@@ -220,11 +230,13 @@ class _MoodPageState extends State<MoodPage> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      print(moodTextController.text);
                       addMoodData(moodTextController.text);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple, // 設置按鈕顏色為紫色
+                      backgroundColor: const Color.fromARGB(255, 186, 195, 89),
+                      textStyle: const TextStyle(
+                        color: Color.fromARGB(255, 66, 66, 66), 
+                      ),
                     ),
                     child: const Text('確認'),
                   ),
