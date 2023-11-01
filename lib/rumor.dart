@@ -1,10 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // 導入日期格式化的庫
+import 'package:intl/intl.dart';
 
 import 'main.dart';
-import 'rumor_info.dart'; // 替換為你的詳細資訊頁面的引入
+import 'rumor_info.dart';
 import 'data/dbhelper.dart';
 
 class RumorPage extends StatefulWidget {
@@ -19,12 +18,13 @@ class _RumorPageState extends State<RumorPage> {
   late DatabaseHelper _databaseHelper;
   List<Map<String, dynamic>> _searchResults = [];
   List<Map<String, dynamic>> _allData = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _databaseHelper = DatabaseHelper(createDatabaseConnection());
-    _loadAllData(); // 初始化時載入所有資料
+    _loadAllData();
   }
 
   @override
@@ -33,7 +33,6 @@ class _RumorPageState extends State<RumorPage> {
     super.dispose();
   }
 
-  // 載入所有數據
   Future<void> _loadAllData() async {
     await _databaseHelper.openConnection();
     final data = await _databaseHelper.fetchRumorData();
@@ -44,12 +43,12 @@ class _RumorPageState extends State<RumorPage> {
     setState(() {
       _allData = data;
       _searchResults = data;
+      isLoading = false;
     });
   }
 
   Future<void> _searchData(String searchTerm) async {
     if (searchTerm.isEmpty) {
-      // 如果搜索文本為空，顯示所有資料
       setState(() {
         _searchResults = _allData;
       });
@@ -79,7 +78,6 @@ class _RumorPageState extends State<RumorPage> {
     Icons.volunteer_activism
   ];
 
-  // 獲取隨機圖示的方法
   IconData getRandomIcon() {
     final random = Random();
     final randomIndex = random.nextInt(randomIcons.length);
@@ -95,11 +93,11 @@ class _RumorPageState extends State<RumorPage> {
           '健康闢謠',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold, // 設置字體加粗
-          ), // 設置字體顏色為黑色
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: const Color(0xFFF9410E),
-        iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       drawer: const AppDrawer(),
       body: Column(
@@ -120,32 +118,36 @@ class _RumorPageState extends State<RumorPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _searchResults.length,
-              itemBuilder: (context, index) {
-                final id = _searchResults[index]['id'];
-                final title = _searchResults[index]['title'];
-                final publishDate = _searchResults[index]['publish_date'];
-                final permitDateFormat = DateFormat('yyyy-MM-dd');
-                final formatpublishDate = permitDateFormat.format(publishDate);
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(), // 使用 CircularProgressIndicator 作為 loading icon
+                  )
+                : ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final id = _searchResults[index]['id'];
+                      final title = _searchResults[index]['title'];
+                      final publishDate = _searchResults[index]['publish_date'];
+                      final permitDateFormat = DateFormat('yyyy-MM-dd');
+                      final formatpublishDate = permitDateFormat.format(publishDate);
 
-                return Column(children: [
-                  ListTile(
-                    leading: Icon(getRandomIcon(),
-                        color: const Color.fromARGB(255, 250, 95, 95)), // 使用隨機圖示
-                    title: Text('$title'),
-                    subtitle: Text(formatpublishDate),
-                    onTap: () {
-                      _navigateToDetailPage(title, id);
+                      return Column(children: [
+                        ListTile(
+                          leading: Icon(getRandomIcon(),
+                              color: const Color.fromARGB(255, 250, 95, 95)),
+                          title: Text('$title'),
+                          subtitle: Text(formatpublishDate),
+                          onTap: () {
+                            _navigateToDetailPage(title, id);
+                          },
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Divider(height: 1, color: Colors.grey),
+                        ),
+                      ]);
                     },
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0), // 設置水準內邊距
-                    child: Divider(height: 1, color: Colors.grey), // 添加分隔線
-                  ),
-                ]);
-              },
-            ),
           ),
         ],
       ),
