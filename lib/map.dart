@@ -58,17 +58,6 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _addMarkers() async {
-    // Create a custom icon for the current location marker
-    // var customIcon = await BitmapDescriptor.fromAssetImage(
-    //     const ImageConfiguration(), 'assets/images/user.png');
-
-    // // Add the current location marker
-    // _markers["0"] = Marker(
-    //   markerId: MarkerId("0".toString()), // Use a string as the marker ID
-    //   position: currentLocation,
-    //   icon: customIcon,
-    // );
-
     final markerData = await fetchDataFromPostgreSQL();
     print(markerData);
 

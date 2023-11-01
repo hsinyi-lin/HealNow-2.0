@@ -54,7 +54,7 @@ class _MoodPageState extends State<MoodPage> {
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept-Charset': 'UTF-8',
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer ',
       },
       body: json.encode({
         "model": "gpt-3.5-turbo",
@@ -212,7 +212,7 @@ class _MoodPageState extends State<MoodPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   const Text(
-                    '紀錄心情',
+                    '記錄心情',
                     style: TextStyle(
                       fontWeight: FontWeight.bold, 
                     ),

@@ -49,7 +49,7 @@ class SQLiteDatabaseHelper {
         id INTEGER PRIMARY KEY,
         content TEXT,
         ai_reply TEXT,
-        created_at DATETIME
+        created_at DATE
       )
     ''');
   }
@@ -57,12 +57,11 @@ class SQLiteDatabaseHelper {
   // 新增資料
   Future<int> insertData(Map<String, dynamic> data) async {
     var dbClient = await db;
-    
-    final now = DateTime.now();
-    final eightHoursLater = now.add(const Duration(hours: 8));
-    print(eightHoursLater);
 
-    data['created_at'] = DateFormat('yyyy-MM-dd HH:mm:ss').format(eightHoursLater);
+    final now = DateTime.now();
+    final updateTime = now.add(const Duration(days:1, hours: 3));
+
+    data['created_at'] = DateFormat('yyyy-MM-dd').format(updateTime);
 
     return await dbClient.insert('mood', data);
   }
