@@ -39,6 +39,8 @@ class _NewsPageState extends State<NewsPage> {
     final data = await _databaseHelper.fetchNewsData();
     await _databaseHelper.closeConnection();
 
+    print(data);
+
     setState(() {
       _allData = data;
       _searchResults = data;

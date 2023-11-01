@@ -38,6 +38,8 @@ class _MyhomeState extends State<Myhome> {
     final data = await _databaseHelper.fetchMedData(); // 從資料庫獲取藥物資料
     await _databaseHelper.closeConnection(); // 關閉資料庫連接
 
+    print(data);
+    
     setState(() {
       _allData = data; // 更新所有資料清單
       _searchResults = data; // 更新搜索結果列表

@@ -39,6 +39,8 @@ class _RumorPageState extends State<RumorPage> {
     final data = await _databaseHelper.fetchRumorData();
     await _databaseHelper.closeConnection();
 
+    print(data);
+
     setState(() {
       _allData = data;
       _searchResults = data;
