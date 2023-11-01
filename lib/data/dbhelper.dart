@@ -39,6 +39,8 @@ class DatabaseHelper {
   // ];
 
   Future<List<Map<String, dynamic>>> fetchMedData() async {
+    print('正在取得資料...');
+
     final result = await _connection.query('SELECT * FROM med ');
 
     // for (final row in result) {
@@ -60,7 +62,8 @@ class DatabaseHelper {
     return result.map((row) => row.toColumnMap()).toList();
   }
 
-Future<List<Map<String, dynamic>>> fetchNewsData() async {
+  Future<List<Map<String, dynamic>>> fetchNewsData() async {
+    print('正在取得資料...');
     final result = await _connection.query('SELECT * FROM news ');
     final dataList = result.map((row) => row.toColumnMap());
 
@@ -68,32 +71,37 @@ Future<List<Map<String, dynamic>>> fetchNewsData() async {
   }
 
   Future<List<Map<String, dynamic>>> fetchNewsDataByTitle(String title, int id) async {
-  final result = await _connection.query(
-    'SELECT * FROM news WHERE title = @title AND id = @id',
-    substitutionValues: {'title': title, 'id': id},
-  );
+    print('正在取得資料...');
 
-  return result.map((row) => row.toColumnMap()).toList();
-}
+    final result = await _connection.query(
+      'SELECT * FROM news WHERE title = @title AND id = @id',
+      substitutionValues: {'title': title, 'id': id},
+    );
 
-Future<List<Map<String, dynamic>>> fetchRumorData() async {
+    return result.map((row) => row.toColumnMap()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRumorData() async {
     final result = await _connection.query('SELECT * FROM clarification ');
     final dataList = result.map((row) => row.toColumnMap());
 
     return dataList.toList();
   }
 
-Future<List<Map<String, dynamic>>> fetchRumorDataByTitle(String title, int id) async {
-  final result = await _connection.query(
-    'SELECT * FROM clarification WHERE title = @title AND id = @id',
-    substitutionValues: {'title': title, 'id': id},
-  );
+  Future<List<Map<String, dynamic>>> fetchRumorDataByTitle(
+      String title, int id) async {
+    final result = await _connection.query(
+      'SELECT * FROM clarification WHERE title = @title AND id = @id',
+      substitutionValues: {'title': title, 'id': id},
+    );
 
-  return result.map((row) => row.toColumnMap()).toList();
-}
+    return result.map((row) => row.toColumnMap()).toList();
+  }
 
   // Add other database operation methods
   Future<List<Map<String, dynamic>>> fetchPharmacyData() async {
+    print('正在取得資料...');
+
     final result = await _connection.query('SELECT * FROM pharmacy');
     final dataList = result.map((row) => row.toColumnMap());
 
