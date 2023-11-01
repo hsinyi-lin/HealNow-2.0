@@ -12,40 +12,41 @@ class Myhome extends StatefulWidget {
 }
 
 class _MyhomeState extends State<Myhome> {
-  final TextEditingController _searchController = TextEditingController();
-  late DatabaseHelper _databaseHelper;
-  List<Map<String, dynamic>> _searchResults = [];
-  List<Map<String, dynamic>> _allData = [];
+  final TextEditingController _searchController =
+      TextEditingController(); // 創建搜索文字方塊的控制器
+  late DatabaseHelper _databaseHelper; // 創建資料庫説明類的實例
+  List<Map<String, dynamic>> _searchResults = []; // 存儲搜索結果的清單
+  List<Map<String, dynamic>> _allData = []; // 存儲所有資料的清單
 
   @override
   void initState() {
     super.initState();
-    _databaseHelper = DatabaseHelper(createDatabaseConnection());
+    _databaseHelper = DatabaseHelper(createDatabaseConnection()); // 初始化資料庫説明類
     _loadAllData(); // 初始化時載入所有資料
   }
 
-  // 用於執行資源釋放，dispose 是 State 的生命周期方法之一
+  // 用於執行資源釋放，dispose 是 State 的生命週期方法之一
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchController.dispose(); // 釋放搜索文字方塊的控制器
     super.dispose();
   }
 
-  // 載入所有數據
+  // 載入所有資料
   Future<void> _loadAllData() async {
-    await _databaseHelper.openConnection();
-    final data = await _databaseHelper.fetchMedData();
-    await _databaseHelper.closeConnection();
+    await _databaseHelper.openConnection(); // 打開資料庫連接
+    final data = await _databaseHelper.fetchMedData(); // 從資料庫獲取藥物資料
+    await _databaseHelper.closeConnection(); // 關閉資料庫連接
 
     setState(() {
-      _allData = data;
-      _searchResults = data;
+      _allData = data; // 更新所有資料清單
+      _searchResults = data; // 更新搜索結果列表
     });
   }
 
   Future<void> _searchData(String searchTerm) async {
     if (searchTerm.isEmpty) {
-      // 如果搜索文本为空，显示所有数据
+      // 如果搜索文本為空，顯示所有資料
       setState(() {
         _searchResults = _allData;
       });
@@ -57,7 +58,7 @@ class _MyhomeState extends State<Myhome> {
           item['med_en_name'].toLowerCase().contains(searchTerm.toLowerCase()));
 
       setState(() {
-        _searchResults = results.toList();
+        _searchResults = results.toList(); // 更新搜索結果列表
       });
     }
   }
@@ -66,12 +67,13 @@ class _MyhomeState extends State<Myhome> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MedPage(title: itemTitle, id: itemId),
+        builder: (context) =>
+            MedPage(title: itemTitle, id: itemId), // 導航到詳細資訊頁面
       ),
     );
   }
 
-  // 从这个列表中选择随机图标
+  // 從這個清單中選擇隨機圖示
   final List<IconData> randomIcons = [
     Icons.medical_services,
     Icons.vaccines,
@@ -79,17 +81,17 @@ class _MyhomeState extends State<Myhome> {
     Icons.healing
   ];
 
-  // 获取随机图标的方法
+  // 獲取隨機圖示的方法
   IconData getRandomIcon() {
     final random = Random();
     final randomIndex = random.nextInt(randomIcons.length);
-    return randomIcons[randomIndex];
+    return randomIcons[randomIndex]; // 返回隨機圖示
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:const Color.fromARGB(255, 231, 247, 246),
+      backgroundColor: const Color.fromARGB(255, 231, 247, 246), // 設置背景顏色
       body: Column(
         children: <Widget>[
           Padding(
@@ -97,11 +99,11 @@ class _MyhomeState extends State<Myhome> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '輸入搜尋文字',
+                hintText: '輸入搜尋文字', // 設置搜索文字方塊的提示文字
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search), // 設置搜索圖示
                   onPressed: () {
-                    _searchData(_searchController.text);
+                    _searchData(_searchController.text); // 觸發搜索操作
                   },
                 ),
               ),
@@ -119,17 +121,17 @@ class _MyhomeState extends State<Myhome> {
                   children: [
                     ListTile(
                       leading: Icon(getRandomIcon(),
-                          color: const Color(0xFF1179FA)), // 使用随机图标
-                      title: Text('$medTwName'),
-                      subtitle: Text('$medEnName'),
+                          color: const Color(0xFF1179FA)), // 使用隨機圖示
+                      title: Text('$medTwName'), // 顯示藥物中文名稱
+                      subtitle: Text('$medEnName'), // 顯示藥物英文名稱
                       onTap: () {
-                        _navigateToDetailPage(medTwName, id);
+                        _navigateToDetailPage(medTwName, id); // 點擊時導航到詳細資訊頁面
                       },
                     ),
                     const Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 16.0), // 设置水平内边距
-                      child: Divider(height: 1, color: Colors.grey), // 添加分隔线
+                          EdgeInsets.symmetric(horizontal: 16.0), // 設置水準內邊距
+                      child: Divider(height: 1, color: Colors.grey), // 添加分隔線
                     ),
                   ],
                 );

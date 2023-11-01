@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // 导入日期格式化的库
+import 'package:intl/intl.dart'; // 導入日期格式化的庫
 
 import 'main.dart';
 import 'rumor_info.dart'; // 替換為你的詳細資訊頁面的引入
@@ -47,7 +47,7 @@ class _RumorPageState extends State<RumorPage> {
 
   Future<void> _searchData(String searchTerm) async {
     if (searchTerm.isEmpty) {
-      // 如果搜索文本为空，显示所有数据
+      // 如果搜索文本為空，顯示所有資料
       setState(() {
         _searchResults = _allData;
       });
@@ -77,7 +77,7 @@ class _RumorPageState extends State<RumorPage> {
     Icons.volunteer_activism
   ];
 
-  // 获取随机图标的方法
+  // 獲取隨機圖示的方法
   IconData getRandomIcon() {
     final random = Random();
     final randomIndex = random.nextInt(randomIcons.length);
@@ -93,11 +93,11 @@ class _RumorPageState extends State<RumorPage> {
           '健康闢謠',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold, // 设置字体加粗
-          ), // 设置字体颜色为黑色
+            fontWeight: FontWeight.bold, // 設置字體加粗
+          ), // 設置字體顏色為黑色
         ),
         backgroundColor: const Color(0xFFF9410E),
-        iconTheme: const IconThemeData(color: Colors.black), // 设置菜单图标颜色为黑色
+        iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
       ),
       drawer: const AppDrawer(),
       body: Column(
@@ -130,7 +130,7 @@ class _RumorPageState extends State<RumorPage> {
                 return Column(children: [
                   ListTile(
                     leading: Icon(getRandomIcon(),
-                        color: const Color.fromARGB(255, 250, 95, 95)), // 使用随机图标
+                        color: const Color.fromARGB(255, 250, 95, 95)), // 使用隨機圖示
                     title: Text('$title'),
                     subtitle: Text(formatpublishDate),
                     onTap: () {
@@ -138,8 +138,8 @@ class _RumorPageState extends State<RumorPage> {
                     },
                   ),
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0), // 设置水平内边距
-                    child: Divider(height: 1, color: Colors.grey), // 添加分隔线
+                    padding: EdgeInsets.symmetric(horizontal: 16.0), // 設置水準內邊距
+                    child: Divider(height: 1, color: Colors.grey), // 添加分隔線
                   ),
                 ]);
               },

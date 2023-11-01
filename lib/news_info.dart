@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'data/dbhelper.dart';
-import 'package:intl/intl.dart'; // 导入日期格式化的库
+import 'package:intl/intl.dart'; // 導入日期格式化的庫
 
 class NewsInfoPage extends StatefulWidget {
   final String title; // 接收所選列表的標題
@@ -60,7 +60,7 @@ class _NewsInfoPageState extends State<NewsInfoPage> {
           } else {
             final data = snapshot.data;
 
-            // 检查数据是否为空或为 null，并相应处理
+            // 檢查資料是否為空或為 null，並相應處理
             if (data == null || data.isEmpty) {
               return const Center(child: Text('No data available'));
             }
@@ -70,22 +70,22 @@ class _NewsInfoPageState extends State<NewsInfoPage> {
               itemBuilder: (context, index) {
                 final title = data[index]['title'];
                 final content = data[index]['content'];
-                // 在从数据库获取的内容中插入换行符
-                final contentTypesetting = content.replaceAll(RegExp(r'\。'), '.\n\n');
+                // 在從資料庫獲取的內容中插入分行符號
+                final contentTypesetting =
+                    content.replaceAll(RegExp(r'\。'), '.\n\n');
                 final url = data[index]['url'];
                 final publishDate = data[index]['publish_date'];
                 final permitDateFormat = DateFormat('yyyy-MM-dd');
                 final formatpublishDate = permitDateFormat.format(publishDate);
 
-                return Card(
-                  color: const Color.fromARGB(255, 183, 222, 248), // 添加顏色
-                  margin: const EdgeInsets.all(8),
+                return Container(
+                  margin: const EdgeInsets.all(15),
                   child: ListTile(
                     title: Text(
                       title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 25,
                       ),
                     ),
                     subtitle: Column(
@@ -93,36 +93,35 @@ class _NewsInfoPageState extends State<NewsInfoPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical:6.0), // 设置垂直内边距
+                              vertical: 6.0), // 設置垂直內邊距
                           child: Text(' $formatpublishDate',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 6.0), // 設置垂直內邊距
                           child: Text(' $contentTypesetting',
-                              style: const TextStyle(color: Colors.black87),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20),
                               textAlign: TextAlign.justify),
-                              ),
-                       
+                        ),
 
-                        const Divider(height: 1, color: Colors.grey), // 添加分隔线
+                        const Divider(height: 1, color: Colors.grey), // 添加分隔線
 
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6.0), // 设置垂直内边距
+                              vertical: 6.0), // 設置垂直內邊距
                           child: Text(
                               url != null && url.isNotEmpty ? '$url' : '沒有連結',
-                              style: const TextStyle(color: Colors.black87)),
+                              style: const TextStyle(
+                                  color: Colors.black87, fontSize: 20)),
                         ),
                       ],
                     ),
-                    onTap: () {
-                      // 點擊列表項的操作
-                    },
                   ),
                 );
               },
