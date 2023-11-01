@@ -1,7 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // 導入日期格式化的庫
+import 'package:intl/intl.dart';
 
 import 'main.dart'; // 引入主應用程式文件
 import 'news_info.dart'; // 替換為你的詳細資訊頁面的引入
@@ -16,11 +15,11 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  final TextEditingController _searchController =
-      TextEditingController(); // 創建文本編輯控制器
-  late DatabaseHelper _databaseHelper; // 創建自定義數據庫助手對象
-  List<Map<String, dynamic>> _searchResults = []; // 創建存儲搜索結果的列表
-  List<Map<String, dynamic>> _allData = []; // 創建存儲所有數據的列表
+  final TextEditingController _searchController = TextEditingController();
+  late DatabaseHelper _databaseHelper;
+  List<Map<String, dynamic>> _searchResults = [];
+  List<Map<String, dynamic>> _allData = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -44,8 +43,9 @@ class _NewsPageState extends State<NewsPage> {
     print(data); // 列印獲取的數據
 
     setState(() {
-      _allData = data; // 更新所有數據列表
-      _searchResults = data; // 更新搜索結果列表
+      _allData = data;
+      _searchResults = data;
+      isLoading = false;
     });
   }
 
@@ -100,8 +100,8 @@ class _NewsPageState extends State<NewsPage> {
           '食藥新聞',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.bold, // 設置字體加粗
-          ), // 設置字體顏色為黑色
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: const Color.fromARGB(255, 94, 190, 250), // 設置應用程式欄背景色
         iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
@@ -125,33 +125,36 @@ class _NewsPageState extends State<NewsPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _searchResults.length, // 設置列表項目數量
-              itemBuilder: (context, index) {
-                final id = _searchResults[index]['id'];
-                final title = _searchResults[index]['title'];
-                final publishDate = _searchResults[index]['publish_date'];
-                final permitDateFormat = DateFormat('yyyy-MM-dd');
-                final formatpublishDate = permitDateFormat.format(publishDate);
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final id = _searchResults[index]['id'];
+                      final title = _searchResults[index]['title'];
+                      final publishDate = _searchResults[index]['publish_date'];
+                      final permitDateFormat = DateFormat('yyyy-MM-dd');
+                      final formatpublishDate = permitDateFormat.format(publishDate);
 
-                return Column(children: [
-                  ListTile(
-                    leading: Icon(getRandomIcon(),
-                        color:
-                            const Color.fromARGB(255, 22, 50, 255)), // 使用隨機圖示
-                    title: Text('$title'), // 顯示標題
-                    subtitle: Text(formatpublishDate), // 顯示日期
-                    onTap: () {
-                      _navigateToDetailPage(title, id); // 點擊列表項目時導航到詳細頁面
+                      return Column(children: [
+                        ListTile(
+                          leading: Icon(getRandomIcon(),
+                              color: const Color.fromARGB(255, 22, 50, 255)),
+                          title: Text('$title'),
+                          subtitle: Text(formatpublishDate),
+                          onTap: () {
+                            _navigateToDetailPage(title, id);
+                          },
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Divider(height: 1, color: Colors.grey),
+                        ),
+                      ]);
                     },
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0), // 設置水準內邊距
-                    child: Divider(height: 1, color: Colors.grey), // 添加分隔線
-                  ),
-                ]);
-              },
-            ),
           ),
         ],
       ),
