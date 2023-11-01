@@ -39,12 +39,12 @@ class _MedPageState extends State<MedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.title,
-          style: const TextStyle(
+        title: const Text(
+          "內容",
+          style: TextStyle(
             color: Colors.black,
           ),
-        ), // 使用所選清單的標題作為頁面標題
+        ),
         backgroundColor: const Color(0xFF00FAE5),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
