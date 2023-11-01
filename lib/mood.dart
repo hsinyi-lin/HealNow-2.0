@@ -17,7 +17,6 @@ class _MoodPageState extends State<MoodPage> {
   TextEditingController moodTextController = TextEditingController();
   FocusNode moodTextFocus = FocusNode();
   String currentDate = '';
-  bool hasMoodEntered = false;
 
   @override
   void initState() {
@@ -49,9 +48,6 @@ class _MoodPageState extends State<MoodPage> {
 
   // 新增情緒資料函式
   Future<void> addMoodData(String content) async {
-    final now = DateTime.now();
-    final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-
     // 呼叫ChatGPT模型
     const apiUrl = 'https://api.openai.com/v1/chat/completions';
     final response = await http.post(
@@ -79,15 +75,11 @@ class _MoodPageState extends State<MoodPage> {
       final dbHelper = SQLiteDatabaseHelper();
       final data = {
         'content': content,
-        'mood_id': 0,
         'ai_reply': aiReply, // 使用 OpenAI 的回應
-        'created_at': formattedDateTime,
-        'updated_at': formattedDateTime,
       };
       await dbHelper.insertData(data);
 
       setState(() {
-        hasMoodEntered = true;
         moodTextController.text = '';
       });
     } else {
@@ -147,6 +139,9 @@ class _MoodPageState extends State<MoodPage> {
     return Card(
       margin: const EdgeInsets.all(10),
       elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0), // 调整半径以设置合适的圆角值
+      ),
       child: Column(
         children: <Widget>[
           ListTile(
@@ -154,9 +149,9 @@ class _MoodPageState extends State<MoodPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item['updated_at'],
+                  item['created_at'],
                   style: const TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.bold)
+                  fontSize: 20)
                 ),
                 const SizedBox(height: 5),
                 Text(item['content']),
@@ -206,7 +201,12 @@ class _MoodPageState extends State<MoodPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Text('紀錄心情'),
+                  const Text(
+                    '紀錄心情',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                    ),
+                  ),
                   TextField(
                     controller: moodTextController,
                     decoration: InputDecoration(
