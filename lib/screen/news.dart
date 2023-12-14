@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:test_app/screen/main.dart';
 
-import 'main.dart'; // 引入主應用程式文件
 import 'news_info.dart'; // 替換為你的詳細資訊頁面的引入
-import 'data/dbhelper.dart'; // 引入用於數據庫操作的自定義助手類
+import '../data/dbhelper.dart'; // 引入用於數據庫操作的自定義助手類
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key}); // 定義名為NewsPage的狀態小部件

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'data/dbhelper.dart';
+import '../data/dbhelper.dart';
 import 'package:intl/intl.dart'; // 導入日期格式化的庫
 
 class RumorInfoPage extends StatefulWidget {

@@ -1,4 +1,4 @@
-#  HealNow 2.0
+#  HealNow
 
 A new Flutter project.
 
