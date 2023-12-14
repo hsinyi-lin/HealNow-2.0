@@ -2,11 +2,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:test_app/screen/main.dart';
 
 // 導入自訂的文件和類
-import 'main.dart';
 import 'rumor_info.dart';
-import 'data/dbhelper.dart';
+import '../data/dbhelper.dart';
 
 // 創建名為RumorPage的StatefulWidget類
 class RumorPage extends StatefulWidget {

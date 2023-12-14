@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart'; 
 import 'package:http/http.dart' as http;
+import 'package:test_app/screen/main.dart';
 import 'dart:convert'; 
 
-import 'main.dart'; 
-import 'data/sqliteHelper.dart'; 
+import '../data/sqliteHelper.dart'; 
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key}); // MoodPage StatefulWidget，接受一個可選的key
