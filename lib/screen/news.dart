@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../widgets/news_card.dart';
+import 'news_detail.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({Key? key}) : super(key: key);
@@ -76,11 +77,11 @@ class _NewsPageState extends State<NewsPage> {
                           newsTitle: item['title'],
                           newsContent: item['content'],
                           onTap: () {
-                            // Navigator.of(context).push(
-                            // MaterialPageRoute(
-                            //   builder: (context) => MedicationDetailPage(medication: medication),
-                            // ),
-                            // );
+                            Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => NewsDetailPage(news: item),
+                            ),
+                            );
                           },
                         );
                       },
