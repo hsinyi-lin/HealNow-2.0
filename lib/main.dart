@@ -1,34 +1,113 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/screen/home.dart';
-import 'package:test_app/widgets/app_drawer.dart';
+import 'screen/home.dart';
 
 void main() {
-  runApp(
-    const MaterialApp(
-      home: MyApp(),
-      debugShowCheckedModeBanner: false,
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: MyAppHome(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MyAppHome extends StatefulWidget {
+  const MyAppHome({Key? key}) : super(key: key);
+
+  @override
+  _MyAppHomeState createState() => _MyAppHomeState();
+}
+
+class _MyAppHomeState extends State<MyAppHome> {
+  String _appBarTitle = 'HealNow';
+  final _currentBody = MedicationLookupPage();
+  bool isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HealNow',
-          style: TextStyle(
-            color: Colors.black,
-          ),
+        title: Text(
+          _appBarTitle,
+          style: TextStyle(color: Colors.black), // Set the text color to black
         ),
-        backgroundColor: const Color.fromARGB(204, 12, 248, 228),
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.grey),
+        elevation: 0,
       ),
-      body: const Myhome(),
-      drawer: const AppDrawer(),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.group),
+                    title: const Text('社群討論'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _appBarTitle = '社群討論';
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.hearing_outlined),
+                    title: const Text('心情紀錄'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _appBarTitle = '心情紀錄';
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Divider(), // Divider
+            Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.login),
+                  title: const Text('登入'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _appBarTitle = '登入';
+                      // _currentBody = LoginPage();
+                    });
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.person_add),
+                  title: const Text('註冊'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _appBarTitle = '註冊';
+                      // _currentBody = RegisterPage();
+                    });
+                  },
+                ),
+              ],
+            ),
+        ],
+        ),
+      ),
+      body: _currentBody,
     );
   }
 }
