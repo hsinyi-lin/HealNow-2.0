@@ -11,7 +11,7 @@ String formatDateString(String dateString) {
 class MedicationDetailPage extends StatelessWidget {
   final Map<String, dynamic> medication;
 
-  MedicationDetailPage({Key? key, required this.medication}) : super(key: key);
+  const MedicationDetailPage({Key? key, required this.medication}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

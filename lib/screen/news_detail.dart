@@ -13,7 +13,7 @@ String formatDateString(String dateString) {
 class NewsDetailPage extends StatelessWidget {
   final Map<String, dynamic> news;
 
-  NewsDetailPage({Key? key, required this.news}) : super(key: key);
+  const NewsDetailPage({Key? key, required this.news}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

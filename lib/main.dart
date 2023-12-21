@@ -21,12 +21,12 @@ class MyAppHome extends StatefulWidget {
   const MyAppHome({Key? key}) : super(key: key);
 
   @override
-  _MyAppHomeState createState() => _MyAppHomeState();
+  State<MyAppHome> createState() => _MyAppHomeState();
 }
 
 class _MyAppHomeState extends State<MyAppHome> {
   String _appBarTitle = 'HealNow';
-  final _currentBody = MedicationLookupPage();
+  final _currentBody = const HomePage();
   bool isLoggedIn = false;
 
   @override
@@ -41,7 +41,7 @@ class _MyAppHomeState extends State<MyAppHome> {
       appBar: AppBar(
         title: Text(
           _appBarTitle,
-          style: TextStyle(color: Colors.black), // Set the text color to black
+          style: TextStyle(color: Colors.black), 
         ),
         backgroundColor: Colors.white,
         iconTheme: IconThemeData(color: Colors.grey),

@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../widgets/news_card.dart';
-import 'news_detail.dart';
+import 'med_detail.dart';
+import '../widgets/med_card.dart';
 
-class RumorPage extends StatefulWidget {
-  const RumorPage({Key? key}) : super(key: key);
+class MedicationPage extends StatefulWidget {
+  const MedicationPage({Key? key}) : super(key: key);
 
   @override
-  State<RumorPage> createState() => _RumorPageState();
+  State<MedicationPage> createState() => _MedicationPageState();
 }
 
-class _RumorPageState extends State<RumorPage> {
-  Future<List<dynamic>>? rumors;
+class _MedicationPageState extends State<MedicationPage> {
+  Future<List<dynamic>>? medications;
 
-  Future<List<Map<String, dynamic>>> fetchRumors() async {
+  Future<List<Map<String, dynamic>>> fetchMedications() async {
     final response = await http.get(Uri.parse(
-      'http://127.0.0.1:5000/opendatas/3',
+      'http://127.0.0.1:5000/opendatas/1',
     ));
 
     if (response.statusCode == 200) {
@@ -26,14 +26,14 @@ class _RumorPageState extends State<RumorPage> {
       final List<dynamic> recipeList = data['data'];
       return recipeList.map((json) => json as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Failed to load rumors');
+      throw Exception('Failed to load medications');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    rumors = fetchRumors();
+    medications = fetchMedications();
   }
 
   @override
@@ -48,19 +48,19 @@ class _RumorPageState extends State<RumorPage> {
               decoration: InputDecoration(
                 hintText: '名稱',
                 prefixIcon: const Icon(Icons.search),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 filled: true,
-                fillColor: const Color.fromARGB(255, 234, 234, 234),
+                fillColor: Color.fromARGB(255, 234, 234, 234),
               ),
             ),
             const SizedBox(height: 20),
             Expanded(
               child: FutureBuilder<List<dynamic>>(
-                future: rumors,
+                future: medications,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -71,16 +71,16 @@ class _RumorPageState extends State<RumorPage> {
                       itemCount: snapshot.data!.length,
                       separatorBuilder: (context, index) => Divider(),
                       itemBuilder: (context, index) {
-                        var rumor = snapshot.data![index];
-                        return NewsCard(
-                          newsDate: rumor['publish_date'],
-                          newsTitle: rumor['title'],
-                          newsContent: rumor['content'],
+                        var medication = snapshot.data![index];
+                        return MedCard(
+                          medTwName: medication['med_tw_name'],
+                          medEnName: medication['permit_num'],
                           onTap: () {
                             Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => NewsDetailPage(news: rumor),
-                            ),
+                              MaterialPageRoute(
+                                builder: (context) => MedicationDetailPage(
+                                    medication: medication),
+                              ),
                             );
                           },
                         );

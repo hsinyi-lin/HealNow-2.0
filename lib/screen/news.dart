@@ -9,7 +9,7 @@ class NewsPage extends StatefulWidget {
   const NewsPage({Key? key}) : super(key: key);
 
   @override
-  _NewsPageState createState() => _NewsPageState();
+  State<NewsPage> createState() => _NewsPageState();
 }
 
 class _NewsPageState extends State<NewsPage> {
