@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:test_app/screen/main.dart';
+import 'package:test_app/widgets/app_drawer.dart';
 
 // 導入自訂的文件和類
 import 'rumor_info.dart';

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:test_app/screen/main.dart';
+import 'package:test_app/widgets/app_drawer.dart';
 
 import 'news_info.dart'; // 替換為你的詳細資訊頁面的引入
 import '../data/dbhelper.dart'; // 引入用於數據庫操作的自定義助手類
