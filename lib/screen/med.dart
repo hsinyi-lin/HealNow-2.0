@@ -27,8 +27,8 @@ class _MedicationPageState extends State<MedicationPage> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data =
           json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> recipeList = data['data'];
-      return recipeList.map((json) => json as Map<String, dynamic>).toList();
+      final List<dynamic> medList = data['data'];
+      return medList.map((json) => json as Map<String, dynamic>).toList();
     } else {
       throw Exception('Failed to load medications');
     }
