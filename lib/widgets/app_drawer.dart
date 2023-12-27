@@ -4,6 +4,7 @@ import 'package:test_app/screen/map.dart';
 import 'package:test_app/screen/mood.dart';
 import 'package:test_app/screen/news.dart';
 import 'package:test_app/screen/rumor.dart';
+import 'package:test_app/screen/collect.dart';
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -50,6 +51,13 @@ class AppDrawer extends StatelessWidget {
             title: const Text('記錄心情'),
             onTap: () {
               navigateToPage(context, const MoodPage());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.mood, color: Color.fromARGB(255, 227, 17, 250)),
+            title: const Text('收藏'),
+            onTap: () {
+              navigateToPage(context, CollectPage());
             },
           ),
         ],

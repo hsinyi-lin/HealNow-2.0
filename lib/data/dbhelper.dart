@@ -41,7 +41,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> fetchMedData() async {
     print('正在取得資料...');
 
-    final result = await _connection.query('SELECT * FROM med ');
+    final result = await _connection.query('SELECT * FROM med LIMIT 5');
 
     // for (final row in result) {
     //   final id = row[0];
@@ -64,7 +64,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> fetchNewsData() async {
     // print('正在取得資料...');
-    final result = await _connection.query('SELECT * FROM news ');
+    final result = await _connection.query('SELECT * FROM news LIMIT 5');
     final dataList = result.map((row) => row.toColumnMap());
 
     return dataList.toList();
