@@ -1,163 +1,119 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:test_app/screen/main.dart';
-import 'package:test_app/widgets/app_drawer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-import 'news_info.dart'; // 替換為你的詳細資訊頁面的引入
-import '../data/dbhelper.dart'; // 引入用於數據庫操作的自定義助手類
+import '../widgets/news_card.dart';
+import 'news_detail.dart';
 
 class NewsPage extends StatefulWidget {
-  const NewsPage({super.key}); // 定義名為NewsPage的狀態小部件
+  const NewsPage({Key? key}) : super(key: key);
 
   @override
-  State<NewsPage> createState() =>
-      _NewsPageState(); // 覆寫createState方法以建立NewsPage的狀態
+  State<NewsPage> createState() => _NewsPageState();
 }
 
 class _NewsPageState extends State<NewsPage> {
-  final TextEditingController _searchController = TextEditingController();
-  late DatabaseHelper _databaseHelper;
-  List<Map<String, dynamic>> _searchResults = [];
-  List<Map<String, dynamic>> _allData = [];
-  bool isLoading = true;
+  Future<List<dynamic>>? news;
+  List<dynamic> allNews = []; // 用於儲存所有資料
+  List<dynamic> filteredNews = []; // 用於儲存過濾後的資料
+  String searchQuery = '';
+
+  Future<List<Map<String, dynamic>>> fetchNews() async {
+    final response = await http.get(Uri.parse(
+      'https://healnow.azurewebsites.net/opendatas/2',
+    ));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data =
+          json.decode(const Utf8Decoder().convert(response.bodyBytes));
+      final List<dynamic> newsList = data['data'];
+      return newsList.map((json) => json as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Failed to load news');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _databaseHelper = DatabaseHelper(createDatabaseConnection()); // 初始化數據庫助手
-    _loadAllData(); // 初始化時載入所有資料
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose(); // 釋放文本編輯控制器
-    super.dispose();
-  }
-
-  // 載入所有數據
-  Future<void> _loadAllData() async {
-    await _databaseHelper.openConnection(); // 打開數據庫連接
-    final data = await _databaseHelper.fetchNewsData(); // 從數據庫中獲取新聞數據
-    await _databaseHelper.closeConnection(); // 關閉數據庫連接
-
-    print(data); // 列印獲取的數據
-
-    setState(() {
-      _allData = data;
-      _searchResults = data;
-      isLoading = false;
+    news = fetchNews().then((newsList) {
+      allNews = newsList;
+      filteredNews = newsList;
+      return newsList;
     });
   }
 
-  // 搜索數據
-  Future<void> _searchData(String searchTerm) async {
-    if (searchTerm.isEmpty) {
-      // 如果搜索文本為空，顯示所有資料
-      setState(() {
-        _searchResults = _allData;
-      });
-    } else {
-      final results = _allData.where((item) => item['title']
-          .toLowerCase()
-          .contains(searchTerm.toLowerCase())); // 根據標題進行搜索
-
-      setState(() {
-        _searchResults = results.toList(); // 更新搜索結果列表
-      });
-    }
-  }
-
-  // 導航到詳細頁面
-  void _navigateToDetailPage(String itemTitle, int itemId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => NewsInfoPage(title: itemTitle, id: itemId),
-      ),
-    );
-  }
-  // 存儲隨機圖示的清單
-  final List<IconData> randomIcons = [
-    Icons.newspaper,
-    Icons.menu_book,
-    Icons.local_library,
-    Icons.email
-  ];
-
-  // 獲取隨機圖示的方法
-  IconData getRandomIcon() {
-    final random = Random();
-    final randomIndex = random.nextInt(randomIcons.length);
-    return randomIcons[randomIndex]; // 返回隨機圖示
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+      filteredNews = allNews.where((news) {
+        return news['title'].toString().contains(newQuery);
+      }).toList();
+      // print('-------');
+      // for (var newsItem in filteredNews) {
+      //   print(newsItem['title']);
+      // }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 230, 243, 251), // 設置背景色
-      appBar: AppBar(
-        title: const Text(
-          '食藥新聞',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: const Color.fromARGB(255, 94, 190, 250), // 設置應用程式欄背景色
-        iconTheme: const IconThemeData(color: Colors.black), // 設置功能表圖示顏色為黑色
-      ),
-      drawer: const AppDrawer(), // 設置側邊欄
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          children: <Widget>[
+            const SizedBox(height: 20),
+            TextField(
+              onChanged: updateSearchQuery,
               decoration: InputDecoration(
-                hintText: '輸入搜尋文字',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    _searchData(_searchController.text);
-                  },
+                hintText: '名稱',
+                prefixIcon: const Icon(Icons.search),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
+                filled: true,
+                fillColor: const Color.fromARGB(255, 234, 234, 234),
               ),
             ),
-          ),
-          Expanded(
-            child: isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final id = _searchResults[index]['id'];
-                      final title = _searchResults[index]['title'];
-                      final publishDate = _searchResults[index]['publish_date'];
-                      final permitDateFormat = DateFormat('yyyy-MM-dd');
-                      final formatpublishDate = permitDateFormat.format(publishDate);
-
-                      return Column(children: [
-                        ListTile(
-                          leading: Icon(getRandomIcon(),
-                              color: const Color.fromARGB(255, 22, 50, 255)),
-                          title: Text('$title'),
-                          subtitle: Text(formatpublishDate),
+            const SizedBox(height: 20),
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                future: news,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return ListView.separated(
+                      itemCount: filteredNews.length,
+                      separatorBuilder: (context, index) => const Divider(),
+                      itemBuilder: (context, index) {
+                        var item = filteredNews[index];
+                        return NewsCard(
+                          newsDate: item['publish_date'],
+                          newsTitle: item['title'],
+                          newsContent: item['content'],
                           onTap: () {
-                            _navigateToDetailPage(title, id);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NewsDetailPage(news: item),
+                              ),
+                            );
                           },
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Divider(height: 1, color: Colors.grey),
-                        ),
-                      ]);
-                    },
-                  ),
-          ),
-        ],
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

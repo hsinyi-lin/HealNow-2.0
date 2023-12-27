@@ -1,116 +1,79 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/widgets/med_card.dart';
-import 'med_info.dart'; // 將 med_info.dart 引入這裡
-import '../data/dbhelper.dart';
 
-class Myhome extends StatefulWidget {
-  const Myhome({super.key});
+import 'news.dart';
+import 'rumor.dart';
+import 'med.dart';
+import 'pharmacy.dart';
+
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<Myhome> createState() => _MyhomeState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyhomeState extends State<Myhome> {
-  final TextEditingController _searchController = TextEditingController();
-  late DatabaseHelper _databaseHelper;
-  List<Map<String, dynamic>> _searchResults = [];
-  List<Map<String, dynamic>> _allData = [];
-  bool isLoading = true;
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _databaseHelper = DatabaseHelper(createDatabaseConnection());
-    _loadAllData();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadAllData() async {
-    await _databaseHelper.openConnection();
-    final data = await _databaseHelper.fetchMedData();
-    await _databaseHelper.closeConnection();
-
+  // 切換頁面方法
+  void _onTabTapped(int index) {
     setState(() {
-      _allData = data;
-      _searchResults = data;
-      isLoading = false;
+      _currentIndex = index;
     });
   }
-
-  Future<void> _searchData(String searchTerm) async {
-    if (searchTerm.isEmpty) {
-      setState(() {
-        _searchResults = _allData;
-      });
-    } else {
-      final results = _allData.where((item) =>
-          item['med_tw_name']
-              .toLowerCase()
-              .contains(searchTerm.toLowerCase()) ||
-          item['med_en_name'].toLowerCase().contains(searchTerm.toLowerCase()));
-
-      setState(() {
-        _searchResults = results.toList();
-      });
-    }
-  }
-
-  void _navigateToDetailPage(String itemTitle, int itemId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MedPage(title: itemTitle, id: itemId),
-      ),
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 231, 247, 246),
-      body: Column(
+      body: IndexedStack(
+        index: _currentIndex,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: '輸入搜尋文字',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    _searchData(_searchController.text);
-                  },
+          const DefaultTabController(
+            length: 3,  
+            child: Column(
+              children: <Widget>[
+                TabBar(
+                  labelColor: Colors.black, 
+                  indicatorColor: Colors.black,  
+                  tabs: [
+                    Tab(icon: Icon(Icons.medication), text: '藥品智庫'),
+                    Tab(icon: Icon(Icons.newspaper), text: '食藥新聞'),
+                    Tab(icon: Icon(Icons.access_alarm), text: '闢謠專區'),
+                  ],
                 ),
-              ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      MedicationPage(),
+                      NewsPage(),
+                      RumorPage(),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final id = _searchResults[index]['id'];
-                      final medTwName = _searchResults[index]['med_tw_name'];
-                      final medEnName = _searchResults[index]['med_en_name'];
-
-                      return MedCard(
-                        medTwName: medTwName,
-                        medEnName: medEnName,
-                        onTap: () {
-                          _navigateToDetailPage(medTwName, id);
-                        },
-                      );
-                    },
-                  ),
-          ),
+          Container(),
+          // 藥局
+          PharmacyPage(),
+          // 收藏(未來需移動至個人)
+          Container(),
+          // 個人
+          Container(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.black,
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: '首頁'),
+          BottomNavigationBarItem(icon: Icon(Icons.group), label: '社群'),
+          BottomNavigationBarItem(icon: Icon(Icons.local_pharmacy_outlined), label: '藥局'),
+          BottomNavigationBarItem(icon: Icon(Icons.local_pharmacy_outlined), label: '收藏'),  // 未來需移動至個人
+          BottomNavigationBarItem(icon: Icon(Icons.person_4_rounded), label: '個人'),
         ],
       ),
     );

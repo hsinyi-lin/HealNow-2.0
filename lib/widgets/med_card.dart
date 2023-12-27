@@ -37,7 +37,7 @@ class MedCard extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.all(12), // 調整內容填充
         leading: CircleAvatar(
-          backgroundColor: Colors.blue, // 設置圓形頭像的背景色
+          backgroundColor: Colors.black, // 設置圓形頭像的背景色
           child: Icon(
             getRandomIcon(),
             color: Colors.white, // 設置圖示顏色

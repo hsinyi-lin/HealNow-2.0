@@ -2,52 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../widgets/news_card.dart';
-import 'news_detail.dart';
+import 'med_detail.dart';
+import '../widgets/med_card.dart';
 
-class RumorPage extends StatefulWidget {
-  const RumorPage({Key? key}) : super(key: key);
+class MedicationPage extends StatefulWidget {
+  const MedicationPage({Key? key}) : super(key: key);
 
   @override
-  State<RumorPage> createState() => _RumorPageState();
+  State<MedicationPage> createState() => _MedicationPageState();
 }
 
-class _RumorPageState extends State<RumorPage> {
-  Future<List<dynamic>>? rumors;
-  List<dynamic> allRumors = []; 
-  List<dynamic> filteredRumors = []; 
+class _MedicationPageState extends State<MedicationPage> {
+  Future<List<dynamic>>? medications;
+  List<dynamic> allMedications = []; // 用於儲存所有藥品資料
+  List<dynamic> filteredMedications = []; // 用於儲存過濾後的資料
   String searchQuery = '';
 
-  Future<List<Map<String, dynamic>>> fetchRumors() async {
+  // 呼叫藥品API
+  Future<List<Map<String, dynamic>>> fetchMedications() async {
     final response = await http.get(Uri.parse(
-      'https://healnow.azurewebsites.net/opendatas/3',
+      'https://healnow.azurewebsites.net/opendatas/1',
     ));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data =
           json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> rumorList = data['data'];
-      return rumorList.map((json) => json as Map<String, dynamic>).toList();
+      final List<dynamic> medList = data['data'];
+      return medList.map((json) => json as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Failed to load rumors');
+      throw Exception('Failed to load medications');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    rumors = fetchRumors().then((rumorList) {
-      allRumors = rumorList;
-      filteredRumors = rumorList;
-      return rumorList;
+    medications = fetchMedications().then((medList) {
+      allMedications = medList; // 將原始資料儲存在 allMedications
+      filteredMedications = medList;
+      return medList;
     });
   }
 
+  // 用於查詢後更新的藥品清單
   void updateSearchQuery(String newQuery) {
     setState(() {
       searchQuery = newQuery;
-      filteredRumors = allRumors.where((rumor) {
-        return rumor['title'].toString().contains(newQuery);
+      filteredMedications = allMedications.where((med) {
+        return med['med_tw_name'].toString().contains(newQuery);
       }).toList();
     });
   }
@@ -77,7 +79,7 @@ class _RumorPageState extends State<RumorPage> {
             const SizedBox(height: 20),
             Expanded(
               child: FutureBuilder<List<dynamic>>(
-                future: rumors,
+                future: medications,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -85,19 +87,18 @@ class _RumorPageState extends State<RumorPage> {
                     return Text('Error: ${snapshot.error}');
                   } else {
                     return ListView.separated(
-                      itemCount: filteredRumors.length,
-                      separatorBuilder: (context, index) => Divider(),
+                      itemCount: filteredMedications.length,
+                      separatorBuilder: (context, index) => const Divider(),
                       itemBuilder: (context, index) {
-                        var rumor = filteredRumors[index];
-                        return NewsCard(
-                          newsDate: rumor['publish_date'],
-                          newsTitle: rumor['title'],
-                          newsContent: rumor['content'],
+                        var medication = filteredMedications[index];
+                        return MedCard(
+                          medTwName: medication['med_tw_name'],
+                          medEnName: medication['permit_num'],
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    NewsDetailPage(news: rumor),
+                                builder: (context) => MedicationDetailPage(
+                                    medication: medication),
                               ),
                             );
                           },
