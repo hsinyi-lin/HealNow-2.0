@@ -4,7 +4,7 @@ import 'news.dart';
 import 'rumor.dart';
 import 'med.dart';
 import 'pharmacy.dart';
-
+import 'collect.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
           // 藥局
           PharmacyPage(),
           // 收藏(未來需移動至個人)
-          Container(),
+          CollectPage(),
           // 個人
           Container(),
         ],
