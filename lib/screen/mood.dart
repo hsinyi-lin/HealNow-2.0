@@ -6,58 +6,7 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 
 import '../widgets/mood_bar.dart';
-
-class MoodDiaryEntry {
-  String content;
-  DateTime date;
-  String aiResponse;
-  double positive;
-  double neutral;
-  double negative;
-  String email;
-  int id;
-  int sentiment;
-
-  MoodDiaryEntry({
-    required this.content,
-    required this.date,
-    required this.aiResponse,
-    required this.positive,
-    required this.neutral,
-    required this.negative,
-    required this.email,
-    required this.id,
-    required this.sentiment,
-  });
-
-  factory MoodDiaryEntry.fromJson(Map<String, dynamic> json) {
-    final dateFormat = DateFormat('EEE, dd MMM yyyy HH:mm:ss z');
-    return MoodDiaryEntry(
-      content: json['content'],
-      date: dateFormat.parse(json['created_time']),
-      aiResponse: json['ai_reply'],
-      positive: double.parse(json['positive']),
-      neutral: double.parse(json['neutral']),
-      negative: double.parse(json['negative']),
-      email: json['email'],
-      id: json['id'],
-      sentiment: json['sentiment'],
-    );
-  }
-
-  MapEntry<IconData, Color> getMoodIcon() {
-    switch (sentiment) {
-      case 1:
-        return const MapEntry(Icons.sentiment_very_satisfied, Colors.green);
-      case 2:
-        return const MapEntry(Icons.sentiment_neutral, Colors.amber);
-      case 3:
-        return const MapEntry(Icons.sentiment_very_dissatisfied, Colors.red);
-      default:
-        return const MapEntry(Icons.sentiment_neutral, Colors.grey);
-    }
-  }
-}
+import '../widgets/mood_diary_entry.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -68,16 +17,39 @@ class MoodPage extends StatefulWidget {
 
 class _MoodPageState extends State<MoodPage> {
   Future<List<MoodDiaryEntry>>? futureEntries;
+  Set<int> selectedMoods = {}; // 用於儲存選中的心情類型
 
   @override
   void initState() {
     super.initState();
-    futureEntries = fetchMedications();
+    futureEntries = fetchMoods();
   }
 
-  Future<List<MoodDiaryEntry>> fetchMedications() async {
+  // 選擇某心情的方法
+  void toggleSelectedMood(int moodType) {
+    setState(() {
+      if (selectedMoods.contains(moodType)) {
+        selectedMoods.remove(moodType);
+      } else {
+        selectedMoods.add(moodType);
+      }
+    });
+  }
+
+   // 用於回傳某心情資料
+  List<MoodDiaryEntry> filterEntries(List<MoodDiaryEntry> entries) {
+    if (selectedMoods.isEmpty) {
+      return entries;
+    }
+    return entries
+        .where((entry) => selectedMoods.contains(entry.sentiment))
+        .toList();
+  }
+
+  // 取得心情資料API
+  Future<List<MoodDiaryEntry>> fetchMoods() async {
     final response =
-        await http.get(Uri.parse('http://127.0.0.1:5000/moods'), headers: {
+        await http.get(Uri.parse('https://healnow.azurewebsites.net/moods'), headers: {
       'Authorization':
           'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00',
     });
@@ -87,14 +59,15 @@ class _MoodPageState extends State<MoodPage> {
           json.decode(const Utf8Decoder().convert(response.bodyBytes))['data'];
       return data.map((json) => MoodDiaryEntry.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load medications');
+      throw Exception('Failed to load moods');
     }
   }
 
+  // 新增心情日記方法
   Future<void> saveContent(
       String content, ScaffoldMessengerState scaffoldMessenger) async {
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/moods'),
+      Uri.parse('https://healnow.azurewebsites.net/moods'),
       headers: {
         'Authorization':
             'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00', // 替换为您的实际令牌
@@ -108,7 +81,44 @@ class _MoodPageState extends State<MoodPage> {
       );
 
       setState(() {
-        futureEntries = fetchMedications();
+        futureEntries = fetchMoods();
+      });
+    } else {
+      print("發生錯誤：${response.statusCode}");
+    }
+  }
+
+    //用滑動方式刪除
+  Future<void> deleteMoodBySlide(int moodId) async {
+    await http.delete(
+      Uri.parse('https://healnow.azurewebsites.net/moods/$moodId'),
+      headers: {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00',
+      },
+    );
+
+    setState(() {
+      futureEntries = fetchMoods();
+    });
+  }
+
+  // 滑動刪除的刪除按鈕
+  Future<void> deleteMood(
+      int moodId, ScaffoldMessengerState scaffoldMessenger) async {
+    print(moodId);
+    final response = await http.delete(
+      Uri.parse('https://healnow.azurewebsites.net/moods/$moodId'),
+      headers: {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00',
+      },
+    );
+    if (response.statusCode == 200) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text("成功")),
+      );
+
+      setState(() {
+        futureEntries = fetchMoods();
       });
     } else {
       print("發生錯誤：${response.statusCode}");
@@ -118,115 +128,169 @@ class _MoodPageState extends State<MoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<MoodDiaryEntry>>(
-        future: futureEntries,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return  Text('');
-          } else if (snapshot.hasError) {
-            return Text("Error: ${snapshot.error}");
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            List<MoodDiaryEntry> entries = snapshot.data!;
-            return ListView.builder(
-              itemCount: entries.length,
-              itemBuilder: (context, index) {
-                var entry = entries[index];
-                return Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                    child: Slidable(
-                      key: ValueKey(index),
-                      endActionPane: ActionPane(
-                        motion: const DrawerMotion(),
-                        dismissible: DismissiblePane(
-                          onDismissed: () {
-                            deleteMoodBySlide(entry.id);
-                          }
-                        ),
-                        extentRatio: 0.25,
-                        children: [
-                          SlidableAction(
-                            onPressed: (context) {
-                              ScaffoldMessengerState scaffoldMessenger =
-                                  ScaffoldMessenger.of(context);
-                              deleteMood(entry.id, scaffoldMessenger).then((_) {
-                                setState(() {});
-                              });
-                            },
-                            backgroundColor:
-                                const Color.fromARGB(255, 255, 118, 118),
-                            foregroundColor:
-                                const Color.fromARGB(255, 255, 255, 255),
-                            icon: Icons.delete,
-                            label: '刪除',
-                            borderRadius: BorderRadius.circular(10),
-                            spacing: 4,
-                          ),
-                        ],
-                      ),
-                      child: Card(
-                        elevation: 10,
-                        margin: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        child: InkWell(
-                          onTap: () => _showDetailsDialog(entry),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: CircleAvatar(
-                                      radius: 30,
-                                      backgroundColor: Colors.white,
-                                      child: Icon(
-                                        entry.getMoodIcon().key,
-                                        color: entry.getMoodIcon().value,
-                                        size: 40,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      entry.content,
-                                      style: TextStyle(
-                                        color: Colors.indigo[600],
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12, 
-                                      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Column(children: [
+          // 心情篩選標籤
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start, //靠左排列
+            children: [
+              const SizedBox(width: 16),
+              FilterChip(
+                label: const Text('正向'),
+                selected: selectedMoods.contains(1),
+                onSelected: (bool selected) {
+                  toggleSelectedMood(1);
+                },
+              ),
+              const SizedBox(width: 8),
+              FilterChip(
+                label: const Text('中立'),
+                selected: selectedMoods.contains(2),
+                onSelected: (bool selected) {
+                  toggleSelectedMood(2);
+                },
+              ),
+              const SizedBox(width: 8),
+              FilterChip(
+                label: const Text('負向'),
+                selected: selectedMoods.contains(3),
+                onSelected: (bool selected) {
+                  toggleSelectedMood(3);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(width: 10),
+          const Divider(),
+          // 心情資料
+          Expanded(
+            child: FutureBuilder<List<MoodDiaryEntry>>(
+              future: futureEntries,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  List<MoodDiaryEntry> entries = filterEntries(snapshot.data!);
+                  return ListView.builder(
+                    itemCount: entries.length,
+                    itemBuilder: (context, index) {
+                      var entry = entries[index];
+                      return Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                          // 滑動刪除
+                          child: Slidable(
+                            key: ValueKey(index),
+                            endActionPane: ActionPane(
+                              motion: const DrawerMotion(),
+                              dismissible: DismissiblePane(onDismissed: () {
+                                deleteMoodBySlide(entry.id);
+                              }),
+                              extentRatio: 0.25,
+                              children: [
+                                SlidableAction(
+                                  onPressed: (context) {
+                                    ScaffoldMessengerState scaffoldMessenger =
+                                        ScaffoldMessenger.of(context);
+                                    deleteMood(entry.id, scaffoldMessenger)
+                                        .then((_) {
+                                      setState(() {});
+                                    });
+                                  },
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 255, 118, 118),
+                                  foregroundColor:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                  icon: Icons.delete,
+                                  label: '刪除',
+                                  borderRadius: BorderRadius.circular(10),
+                                  spacing: 4,
+                                ),
+                              ],
+                            ),
+                            // Card內容
+                            child: Card(
+                              elevation: 4,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 7, horizontal: 15),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: InkWell(
+                                onTap: () => _showDetailsDialog(entry),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.all(12),
+                                          leading: CircleAvatar(
+                                            radius: 30,
+                                            backgroundColor: Colors.white,
+                                            child: Icon(
+                                              entry.getMoodIcon().key,
+                                              color: entry.getMoodIcon().value,
+                                              size: 40,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            entry.content,
+                                            style: TextStyle(
+                                              color: Colors.indigo[600],
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            DateFormat('yyyy-MM-dd')
+                                                .format(entry.date),
+                                            style: const TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 124, 124, 124),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: MoodBar(
+                                            positive: entry.positive,
+                                            neutral: entry.neutral,
+                                            negative: entry.negative,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: MoodBar(
-                                      positive: entry.positive,
-                                      neutral: entry.neutral,
-                                      negative: entry.negative,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ));
+                          ));
+                    },
+                  );
+                } else {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('assets/images/thinking.png', width: 200),
+                        const SizedBox(height: 20),
+                        const Text('還沒有心情相關資料', style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                  );
+                }
               },
-            );
-          } else {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min, 
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset('assets/images/thinking.png', width: 200), 
-                  const SizedBox(height: 20),
-                  const Text('還沒有心情相關資料', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            );
-          }
-        },
+            ),
+          )
+        ]),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
@@ -237,6 +301,7 @@ class _MoodPageState extends State<MoodPage> {
     );
   }
 
+  // 新增心情的dialog
   void _showAddDialog() {
     TextEditingController contentController = TextEditingController();
 
@@ -308,6 +373,7 @@ class _MoodPageState extends State<MoodPage> {
     );
   }
 
+  //顯示心情細項
   void _showDetailsDialog(MoodDiaryEntry entry) {
     showDialog(
       context: context,
@@ -370,42 +436,5 @@ class _MoodPageState extends State<MoodPage> {
         );
       },
     );
-  }
-
-  Future<void> deleteMoodBySlide(int moodId) async {
-    await http.delete(
-      Uri.parse('http://127.0.0.1:5000/moods/$moodId'),
-      headers: {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1...',
-      },
-    );
-
-    setState(() {
-        futureEntries = fetchMedications();
-      });
-  }
-
-  Future<void> deleteMood(
-      int moodId, ScaffoldMessengerState scaffoldMessenger) async {
-    print(moodId);
-    final response = await http.delete(
-      Uri.parse('http://127.0.0.1:5000/moods/$moodId'),
-      headers: {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1...',
-      },
-    );
-    if (response.statusCode == 200) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("成功")),
-      );
-
-      setState(() {
-        futureEntries = fetchMedications();
-      });
-    } else {
-      print("發生錯誤：${response.statusCode}");
-    }
   }
 }
