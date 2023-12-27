@@ -14,10 +14,14 @@ class MedicationPage extends StatefulWidget {
 
 class _MedicationPageState extends State<MedicationPage> {
   Future<List<dynamic>>? medications;
+  List<dynamic> allMedications = []; // 用於儲存所有藥品資料
+  List<dynamic> filteredMedications = []; // 用於儲存過濾後的資料
+  String searchQuery = '';
 
+  // 呼叫藥品API
   Future<List<Map<String, dynamic>>> fetchMedications() async {
     final response = await http.get(Uri.parse(
-      'http://127.0.0.1:5000/opendatas/1',
+      'https://healnow.azurewebsites.net/opendatas/1',
     ));
 
     if (response.statusCode == 200) {
@@ -33,7 +37,21 @@ class _MedicationPageState extends State<MedicationPage> {
   @override
   void initState() {
     super.initState();
-    medications = fetchMedications();
+    medications = fetchMedications().then((medList) {
+      allMedications = medList; // 將原始資料儲存在 allMedications
+      filteredMedications = medList;
+      return medList;
+    });
+  }
+
+  // 用於查詢後更新的藥品清單
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+      filteredMedications = allMedications.where((med) {
+        return med['med_tw_name'].toString().contains(newQuery);
+      }).toList();
+    });
   }
 
   @override
@@ -45,16 +63,17 @@ class _MedicationPageState extends State<MedicationPage> {
           children: <Widget>[
             const SizedBox(height: 20),
             TextField(
+              onChanged: updateSearchQuery,
               decoration: InputDecoration(
                 hintText: '名稱',
                 prefixIcon: const Icon(Icons.search),
-                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 filled: true,
-                fillColor: Color.fromARGB(255, 234, 234, 234),
+                fillColor: const Color.fromARGB(255, 234, 234, 234),
               ),
             ),
             const SizedBox(height: 20),
@@ -68,10 +87,10 @@ class _MedicationPageState extends State<MedicationPage> {
                     return Text('Error: ${snapshot.error}');
                   } else {
                     return ListView.separated(
-                      itemCount: snapshot.data!.length,
-                      separatorBuilder: (context, index) => Divider(),
+                      itemCount: filteredMedications.length,
+                      separatorBuilder: (context, index) => const Divider(),
                       itemBuilder: (context, index) {
-                        var medication = snapshot.data![index];
+                        var medication = filteredMedications[index];
                         return MedCard(
                           medTwName: medication['med_tw_name'],
                           medEnName: medication['permit_num'],
