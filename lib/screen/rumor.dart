@@ -14,17 +14,20 @@ class RumorPage extends StatefulWidget {
 
 class _RumorPageState extends State<RumorPage> {
   Future<List<dynamic>>? rumors;
+  List<dynamic> allRumors = []; 
+  List<dynamic> filteredRumors = []; 
+  String searchQuery = '';
 
   Future<List<Map<String, dynamic>>> fetchRumors() async {
     final response = await http.get(Uri.parse(
-      'http://127.0.0.1:5000/opendatas/3',
+      'https://healnow.azurewebsites.net/opendatas/3',
     ));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data =
           json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> recipeList = data['data'];
-      return recipeList.map((json) => json as Map<String, dynamic>).toList();
+      final List<dynamic> rumorList = data['data'];
+      return rumorList.map((json) => json as Map<String, dynamic>).toList();
     } else {
       throw Exception('Failed to load rumors');
     }
@@ -33,7 +36,20 @@ class _RumorPageState extends State<RumorPage> {
   @override
   void initState() {
     super.initState();
-    rumors = fetchRumors();
+    rumors = fetchRumors().then((rumorList) {
+      allRumors = rumorList;
+      filteredRumors = rumorList;
+      return rumorList;
+    });
+  }
+
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+      filteredRumors = allRumors.where((rumor) {
+        return rumor['title'].toString().contains(newQuery);
+      }).toList();
+    });
   }
 
   @override
@@ -45,6 +61,7 @@ class _RumorPageState extends State<RumorPage> {
           children: <Widget>[
             const SizedBox(height: 20),
             TextField(
+              onChanged: updateSearchQuery,
               decoration: InputDecoration(
                 hintText: '名稱',
                 prefixIcon: const Icon(Icons.search),
@@ -68,19 +85,20 @@ class _RumorPageState extends State<RumorPage> {
                     return Text('Error: ${snapshot.error}');
                   } else {
                     return ListView.separated(
-                      itemCount: snapshot.data!.length,
+                      itemCount: filteredRumors.length,
                       separatorBuilder: (context, index) => Divider(),
                       itemBuilder: (context, index) {
-                        var rumor = snapshot.data![index];
+                        var rumor = filteredRumors[index];
                         return NewsCard(
                           newsDate: rumor['publish_date'],
                           newsTitle: rumor['title'],
                           newsContent: rumor['content'],
                           onTap: () {
                             Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => NewsDetailPage(news: rumor),
-                            ),
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NewsDetailPage(news: rumor),
+                              ),
                             );
                           },
                         );
