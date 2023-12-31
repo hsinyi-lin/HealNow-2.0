@@ -26,6 +26,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child: Image.asset(
+            'assets/images/healnow.png',
+            height: AppBar().preferredSize.height * 0.8,
+            fit: BoxFit.contain,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.grey),
+        elevation: 0,
+      ),
       body: IndexedStack(
         index: _currentIndex,
         children: <Widget>[
