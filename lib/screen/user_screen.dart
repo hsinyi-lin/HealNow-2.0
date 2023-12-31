@@ -1,15 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'login.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
  
 class UserScreen extends StatefulWidget {
-  final String username;
-  final String token;
-
-  UserScreen({required this.username, required this.token});
 
   @override
   _UserScreenState createState() => _UserScreenState();
@@ -19,6 +15,9 @@ class _UserScreenState extends State<UserScreen> {
   String _imageUrl = '';
   String photo = '';
   Map<String, dynamic> userData = {};
+
+  String? token;
+
 
   TextStyle myTextStyle = TextStyle(
     fontSize: 16.0,
@@ -40,12 +39,19 @@ class _UserScreenState extends State<UserScreen> {
     loadUserImageUrl();
   }
 
+  Future<void> loadToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = prefs.getString('token');
+    });
+  }
+
   Future<void> loadUserData() async {
     try {
       final response = await http.get(
         Uri.parse('https://healnow.azurewebsites.net/user'),
         headers: {
-          'Authorization': 'Bearer ${widget.token}',
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -202,7 +208,7 @@ class _UserScreenState extends State<UserScreen> {
       final response = await http.patch(
         Uri.parse('https://healnow.azurewebsites.net/user'),
         headers: {
-          'Authorization': 'Bearer ${widget.token}',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: json.encode({
@@ -238,17 +244,6 @@ class _UserScreenState extends State<UserScreen> {
     }
   }
 
-  void _logout() async {
-    // Clear token and navigate to login screen
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('token');
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -263,15 +258,6 @@ class _UserScreenState extends State<UserScreen> {
             color: Colors.white,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 50),
-            child: IconButton(
-              icon: Icon(Icons.logout_outlined),
-              onPressed: _logout,
-            ),
-          ),
-        ],
       ),
       body: Container(
         decoration: BoxDecoration(
