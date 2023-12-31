@@ -45,6 +45,7 @@ dependencies:
   url_launcher: ^6.2.2
   google_maps_cluster_manager: ^3.0.0+1
   flutter_slidable: ^3.0.1
+  image_picker: ^1.0.5
 
 dev_dependencies:
   flutter_test:
