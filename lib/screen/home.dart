@@ -5,6 +5,7 @@ import 'rumor.dart';
 import 'med.dart';
 import 'pharmacy.dart';
 import 'mood.dart';
+import 'personal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           MoodPage(),
           // CollectPage()
           // 個人
-          Container(),
+          PersonalPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
