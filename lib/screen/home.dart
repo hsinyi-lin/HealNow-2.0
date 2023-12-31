@@ -70,9 +70,6 @@ class _HomePageState extends State<HomePage> {
           Container(),
           // 藥局
           PharmacyPage(),
-          // 收藏(未來需移動至個人)
-          MoodPage(),
-          // CollectPage()
           // 個人
           PersonalPage(),
         ],
@@ -86,7 +83,6 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '首頁'),
           BottomNavigationBarItem(icon: Icon(Icons.group), label: '社群'),
           BottomNavigationBarItem(icon: Icon(Icons.local_pharmacy_outlined), label: '藥局'),
-          BottomNavigationBarItem(icon: Icon(Icons.heart_broken), label: '心情'),  // 未來需移動至個人
           BottomNavigationBarItem(icon: Icon(Icons.person_4_rounded), label: '個人'),
         ],
       ),
