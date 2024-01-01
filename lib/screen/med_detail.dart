@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MedicationDetailPage extends StatefulWidget {
   final Map<String, dynamic> medication;
@@ -14,28 +15,36 @@ class MedicationDetailPage extends StatefulWidget {
 }
 
 class _MedicationDetailPageState extends State<MedicationDetailPage> {
+  late String token;
   bool? isFavorite;
 
   @override
   void initState() {
     super.initState();
+    loadToken().then((loadedToken) {
+      token = loadedToken; // 在 Future 完成後設置 token
 
-    // 取得收藏列表進行比對，以顯示收藏icon類型
-    fetchSavedMedications().then((savedMedications) {
-      setState(() {
-        isFavorite = savedMedications
-            .any((savedMed) => savedMed['id'] == widget.medication['id']);
+      // 取得收藏列表進行比對，以顯示收藏 icon 類型
+      fetchSavedMedications().then((savedMedications) {
+        setState(() {
+          isFavorite = savedMedications
+              .any((savedMed) => savedMed['id'] == widget.medication['id']);
+        });
+      }).catchError((error) {
+        print('Error fetching saved medications: $error');
       });
-    }).catchError((error) {
-      print('Error fetching saved medications: $error');
     });
+  }
+
+  Future<String> loadToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token') ?? '';
   }
 
   // 取得收藏列表
   Future<List<dynamic>> fetchSavedMedications() async {
-    final url = Uri.parse('https://healnow.azurewebsites.net/opendatas/save_class/1');
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00";
+    final url =
+        Uri.parse('https://healnow.azurewebsites.net/opendatas/save_class/1');
 
     final response = await http.get(
       url,
@@ -43,20 +52,21 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
         'Authorization': 'Bearer $token',
       },
     );
-
+    final data = json.decode(response.body);
+    print(data);
     if (response.statusCode == 200) {
       final data = json.decode(response.body)['data'];
       return data.map((json) => json as Map<String, dynamic>).toList();
     } else {
+      print(response.statusCode);
       throw Exception('Failed to load saved medications');
     }
   }
 
+  // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
     final url = Uri.parse(
         'https://healnow.azurewebsites.net/opendatas/save_class/1/${widget.medication['id']}');
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00";
 
     http.Response response;
 
