@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/news_card.dart';
 import 'news_detail.dart';
-import '../services/opendata_services.dart';
+import '../services/opendata_service.dart';
 
 
 class NewsPage extends StatefulWidget {

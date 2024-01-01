@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/opendata_services.dart';
+import '../services/opendata_service.dart';
 
 String formatDateString(String dateString) {
   DateFormat inputFormat = DateFormat('EEE, dd MMM yyyy HH:mm:ss \'GMT\'');

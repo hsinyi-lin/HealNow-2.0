@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/rumor_card.dart';
 import 'rumor_detail.dart';
-import '../services/opendata_services.dart';
+import '../services/opendata_service.dart';
 
 
 class RumorPage extends StatefulWidget {

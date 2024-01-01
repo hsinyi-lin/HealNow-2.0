@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'med_detail.dart';
 import '../widgets/med_card.dart';
-import '../services/opendata_services.dart';
+import '../services/opendata_service.dart';
 
 class MedicationPage extends StatefulWidget {
   const MedicationPage({Key? key}) : super(key: key);

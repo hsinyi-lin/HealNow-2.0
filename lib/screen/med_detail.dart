@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/opendata_services.dart';
+import '../services/opendata_service.dart';
 
 class MedicationDetailPage extends StatefulWidget {
   final Map<String, dynamic> medication;
