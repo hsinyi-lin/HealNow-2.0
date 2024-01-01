@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../widgets/news_card.dart';
-import 'news_detail.dart';
+import '../widgets/rumor_card.dart';
+import 'rumor_detail.dart';
 
 class RumorPage extends StatefulWidget {
   const RumorPage({Key? key}) : super(key: key);
@@ -89,15 +89,15 @@ class _RumorPageState extends State<RumorPage> {
                       separatorBuilder: (context, index) => Divider(),
                       itemBuilder: (context, index) {
                         var rumor = filteredRumors[index];
-                        return NewsCard(
-                          newsDate: rumor['publish_date'],
-                          newsTitle: rumor['title'],
-                          newsContent: rumor['content'],
+                        return RumorCard(
+                          rumorDate: rumor['publish_date'],
+                          rumorTitle: rumor['title'],
+                          rumorContent: rumor['content'],
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    NewsDetailPage(news: rumor),
+                                    RumorDetailPage(rumors: rumor),
                               ),
                             );
                           },
