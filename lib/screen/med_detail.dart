@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/opendata_services.dart';
+
 class MedicationDetailPage extends StatefulWidget {
   final Map<String, dynamic> medication;
 
@@ -25,7 +27,7 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
       token = loadedToken; // 在 Future 完成後設置 token
 
       // 取得收藏列表進行比對，以顯示收藏 icon 類型
-      fetchSavedMedications().then((savedMedications) {
+      OpenDataService().fetchSavedMedications(token).then((savedMedications) {
         setState(() {
           isFavorite = savedMedications
               .any((savedMed) => savedMed['id'] == widget.medication['id']);
@@ -41,60 +43,15 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
     return prefs.getString('token') ?? '';
   }
 
-  // 取得收藏列表
-  Future<List<dynamic>> fetchSavedMedications() async {
-    final url =
-        Uri.parse('https://healnow.azurewebsites.net/opendatas/save_class/1');
-
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-    final data = json.decode(response.body);
-    print(data);
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data'];
-      return data.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      print(response.statusCode);
-      throw Exception('Failed to load saved medications');
-    }
-  }
-
   // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
-    final url = Uri.parse(
-        'https://healnow.azurewebsites.net/opendatas/save_class/1/${widget.medication['id']}');
-
-    http.Response response;
-
-    // 如果 isFavorite 是 true，執行移除收藏
-    if (isFavorite == true) {
-      response = await http.delete(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-    } else {
-      // 如果 isFavorite 是 false，執行新增收藏
-      response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-    }
-
-    if (response.statusCode == 200) {
+    try {
+      await OpenDataService().toggleFavoriteStatus(token, widget.medication['id'], isFavorite ?? false);
       setState(() {
-        // 改變收藏icon
         isFavorite = !(isFavorite ?? false);
       });
-    } else {
-      print('Error updating favorite status');
+    } catch (error) {
+      print('Error updating favorite status: $error');
     }
   }
 

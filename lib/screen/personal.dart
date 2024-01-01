@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'mood.dart';
 import 'user_screen.dart';
+import 'login.dart';
 
 
 class PersonalPage extends StatelessWidget {
@@ -28,7 +32,10 @@ class PersonalPage extends StatelessWidget {
                 '心情',
                 Icons.mood,
                 () {
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MoodPage()),
+                  );
                 },
               ),
               _buildSquareButton(
@@ -44,8 +51,13 @@ class PersonalPage extends StatelessWidget {
               _buildSquareButton(
                 '登出',
                 Icons.exit_to_app,
-                () {
-                  
+                () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  await prefs.remove('token');
+
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
                 },
               ),
             ],
@@ -73,7 +85,7 @@ class PersonalPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Icon(icon, size: 24),
-            Text(title, style: TextStyle(fontSize: 12)),
+            Text(title, style: const TextStyle(fontSize: 12)),
           ],
         ),
       ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../widgets/rumor_card.dart';
 import 'rumor_detail.dart';
+import '../services/opendata_services.dart';
+
 
 class RumorPage extends StatefulWidget {
   const RumorPage({Key? key}) : super(key: key);
@@ -18,25 +18,10 @@ class _RumorPageState extends State<RumorPage> {
   List<dynamic> filteredRumors = []; 
   String searchQuery = '';
 
-  Future<List<Map<String, dynamic>>> fetchRumors() async {
-    final response = await http.get(Uri.parse(
-      'https://healnow.azurewebsites.net/opendatas/3',
-    ));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> rumorList = data['data'];
-      return rumorList.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('Failed to load rumors');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    rumors = fetchRumors().then((rumorList) {
+    rumors = OpenDataService().fetchRumors().then((rumorList) {
       allRumors = rumorList;
       filteredRumors = rumorList;
       return rumorList;
@@ -86,7 +71,7 @@ class _RumorPageState extends State<RumorPage> {
                   } else {
                     return ListView.separated(
                       itemCount: filteredRumors.length,
-                      separatorBuilder: (context, index) => Divider(),
+                      separatorBuilder: (context, index) => const Divider(),
                       itemBuilder: (context, index) {
                         var rumor = filteredRumors[index];
                         return RumorCard(
