@@ -50,7 +50,8 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
 
   // 取得收藏列表
   Future<List<dynamic>> fetchSavedRumors() async {
-    final url = Uri.parse('https://healnow.azurewebsites.net/opendatas/save_class/3');
+    final url =
+        Uri.parse('https://healnow.azurewebsites.net/opendatas/save_class/3');
 
     final response = await http.get(
       url,
@@ -70,7 +71,7 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
   Future<void> toggleFavoriteStatus() async {
     final url = Uri.parse(
         'https://healnow.azurewebsites.net/opendatas/save_class/3/${widget.rumors['id']}');
-        
+
     http.Response response;
 
     // 如果 isFavorite 是 true，執行移除收藏
@@ -138,6 +139,7 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
   }
 
   Widget detailItem(IconData icon, String title, String? value) {
+    bool isUrl = value != null && value.startsWith('http');
     String displayValue = (value == null || value.isEmpty) ? '未提供' : value;
 
     return Padding(
@@ -162,10 +164,28 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.only(left: 32.0),
-            child: Text(displayValue),
+            child: isUrl
+                ? InkWell(
+                    child: Text(displayValue,
+                        style: TextStyle(color: Colors.blue)),
+                    onTap: () => _launchURL(value),
+                  )
+                : Text(displayValue),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _launchURL(String? urlString) async {
+    if (urlString == null) return;
+
+    final Uri url = Uri.parse(urlString);
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'can not open $urlString';
+    }
   }
 }
