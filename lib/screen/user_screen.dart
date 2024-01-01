@@ -4,9 +4,9 @@ import 'login.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
- 
-class UserScreen extends StatefulWidget {
+import '../utils/token.dart';
 
+class UserScreen extends StatefulWidget {
   @override
   _UserScreenState createState() => _UserScreenState();
 }
@@ -16,8 +16,7 @@ class _UserScreenState extends State<UserScreen> {
   String photo = '';
   Map<String, dynamic> userData = {};
 
-  String? token;
-
+  late String token;
 
   TextStyle myTextStyle = TextStyle(
     fontSize: 16.0,
@@ -35,14 +34,13 @@ class _UserScreenState extends State<UserScreen> {
   void initState() {
     super.initState();
     // Load user image URL and data from SharedPreferences
-    loadUserData();
-    loadUserImageUrl();
-  }
+    loadToken().then((loadedToken) {
+      token = loadedToken;
 
-  Future<void> loadToken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      token = prefs.getString('token');
+      setState(() {
+        loadUserData();
+        loadUserImageUrl();
+      });
     });
   }
 
@@ -285,8 +283,8 @@ class _UserScreenState extends State<UserScreen> {
                   ),
                 ),
                 child: Container(
-                  width: 220.0, 
-                  height: 220.0, 
+                  width: 220.0,
+                  height: 220.0,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
