@@ -83,8 +83,8 @@ class _UserScreenState extends State<UserScreen> {
   }
 
   void showUpdateProfileDialog() {
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController genderController = TextEditingController();
+    TextEditingController usernameController = TextEditingController(text:userData['username']);
+    TextEditingController genderController = TextEditingController(text: userData['gender']);
 
     showDialog(
       context: context,
