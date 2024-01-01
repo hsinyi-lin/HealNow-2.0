@@ -35,9 +35,10 @@ class OpenDataService {
     return _fetchData('opendatas/4');
   }
 
-  Future<List<Map<String, dynamic>>> fetchSavedMedications(String token) async {
+  // classId 為 openData 資料類型
+  Future<List<Map<String, dynamic>>> fetchSavedClassList(String token, int classId) async {
     final response = await http.get(
-      Uri.parse('${AppConfig.baseURL}/opendatas/save_class/1'),
+      Uri.parse('${AppConfig.baseURL}/opendatas/save_class/$classId'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -45,12 +46,13 @@ class OpenDataService {
       final List<dynamic> data = json.decode(response.body)['data'];
       return data.map((json) => json as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Failed to load saved medications');
+      throw Exception('Failed to load saved list');
     }
   }
-
-   Future<void> toggleFavoriteStatus(String token, int medId, bool isFavorite) async {
-    final url = Uri.parse('${AppConfig.baseURL}/opendatas/save_class/1/$medId');
+  
+  // classId 為 openData 資料類型, openDataId 為該類型裡面的流水號
+  Future<void> toggleFavoriteStatus(String token, int classId, int openDataId, bool isFavorite) async {
+    final url = Uri.parse('${AppConfig.baseURL}/opendatas/save_class/$classId/$openDataId');
 
     http.Response response;
     if (isFavorite) {

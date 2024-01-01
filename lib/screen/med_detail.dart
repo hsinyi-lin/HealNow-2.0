@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,7 +25,7 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
       token = loadedToken; // 在 Future 完成後設置 token
 
       // 取得收藏列表進行比對，以顯示收藏 icon 類型
-      OpenDataService().fetchSavedMedications(token).then((savedMedications) {
+      OpenDataService().fetchSavedClassList(token, 1).then((savedMedications) {
         setState(() {
           isFavorite = savedMedications
               .any((savedMed) => savedMed['id'] == widget.medication['id']);
@@ -46,7 +44,8 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
   // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
     try {
-      await OpenDataService().toggleFavoriteStatus(token, widget.medication['id'], isFavorite ?? false);
+      await OpenDataService().toggleFavoriteStatus(
+          token, 1, widget.medication['id'], isFavorite ?? false);
       setState(() {
         isFavorite = !(isFavorite ?? false);
       });
