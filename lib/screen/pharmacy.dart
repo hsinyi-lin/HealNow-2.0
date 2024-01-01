@@ -205,7 +205,7 @@ class MapSampleState extends State<PharmacyPage> {
 
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint1 = Paint()..color = Color.fromARGB(255, 165, 207, 40);
+    final Paint paint1 = Paint()..color = const Color.fromARGB(255, 165, 207, 40);
     final Paint paint2 = Paint()..color = Colors.white;
 
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);

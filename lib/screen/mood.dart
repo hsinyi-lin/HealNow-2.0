@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'dart:convert';
-
 import '../widgets/mood_bar.dart';
 import '../widgets/mood_diary_entry.dart';
+
+import '../services/mood_service.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -27,7 +26,7 @@ class _MoodPageState extends State<MoodPage> {
     super.initState();
     loadToken().then((loadedToken) {
       token = loadedToken;
-      futureEntries = fetchMoods();
+      futureEntries = MoodService().fetchMoods(token);
     });
   }
 
@@ -55,60 +54,6 @@ class _MoodPageState extends State<MoodPage> {
     return entries
         .where((entry) => selectedMoods.contains(entry.sentiment))
         .toList();
-  }
-
-  // 取得心情資料API
-  Future<List<MoodDiaryEntry>> fetchMoods() async {
-    final response = await http.get(
-        Uri.parse('https://healnow.azurewebsites.net/moods'),
-        headers: {'Authorization': 'Bearer $token'});
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes))['data'];
-      return data.map((json) => MoodDiaryEntry.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load moods');
-    }
-  }
-
-  // 新增心情日記方法
-  Future<void> saveContent(
-      String content, ScaffoldMessengerState scaffoldMessenger) async {
-    final response = await http.post(
-      Uri.parse('https://healnow.azurewebsites.net/moods'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json'
-      },
-      body: json.encode({'content': content}),
-    );
-
-    if (response.statusCode == 200) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("成功")),
-      );
-
-      setState(() {
-        futureEntries = fetchMoods();
-      });
-    } else {
-      print("發生錯誤：${response.statusCode}");
-    }
-  }
-
-  //刪除Mood
-  Future<void> deleteMood(int moodId) async {
-    await http.delete(
-      Uri.parse('https://healnow.azurewebsites.net/moods/$moodId'),
-      headers: {
-        'Authorization': 'Bearer $token'
-      },
-    );
-
-    setState(() {
-      futureEntries = fetchMoods();
-    });
   }
 
   @override
@@ -182,13 +127,31 @@ class _MoodPageState extends State<MoodPage> {
                             endActionPane: ActionPane(
                               motion: const DrawerMotion(),
                               dismissible: DismissiblePane(onDismissed: () {
-                                deleteMood(entry.id);
+                                MoodService()
+                                    .deleteMood(token, entry.id)
+                                    .then((_) {
+                                  setState(() {
+                                    futureEntries =
+                                        MoodService().fetchMoods(token);
+                                  });
+                                }).catchError((error) {
+                                  print('Error deleting mood: $error');
+                                });
                               }),
                               extentRatio: 0.25,
                               children: [
                                 SlidableAction(
                                   onPressed: (context) {
-                                    deleteMood(entry.id);
+                                    MoodService()
+                                        .deleteMood(token, entry.id)
+                                        .then((_) {
+                                      setState(() {
+                                        futureEntries =
+                                            MoodService().fetchMoods(token);
+                                      });
+                                    }).catchError((error) {
+                                      print('Error deleting mood: $error');
+                                    });
                                   },
                                   backgroundColor:
                                       const Color.fromARGB(255, 255, 118, 118),
@@ -341,19 +304,19 @@ class _MoodPageState extends State<MoodPage> {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      child: const Text('確認',
-                          style: TextStyle(color: Colors.black87)),
-                      onPressed: () {
-                        String content = contentController.text;
-                        ScaffoldMessengerState scaffoldMessenger =
-                            ScaffoldMessenger.of(context);
-                        saveContent(content, scaffoldMessenger).then((_) {
-                          Navigator.of(context).pop();
-
-                          setState(() {});
-                        });
-                      },
-                    ),
+                        child: const Text('確認',
+                            style: TextStyle(color: Colors.black87)),
+                        onPressed: () {
+                          String content = contentController.text;
+                          MoodService().saveMood(token, content).then((_) {
+                            Navigator.of(context).pop();
+                            setState(() {
+                              futureEntries = MoodService().fetchMoods(token);
+                            });
+                          }).catchError((error) {
+                            print('Error saving mood: $error');
+                          });
+                        }),
                   ],
                 ),
               ],

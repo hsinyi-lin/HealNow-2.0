@@ -126,7 +126,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
             child: isUrl
                 ? InkWell(
                     child: Text(displayValue,
-                        style: TextStyle(color: Colors.blue)),
+                        style: const TextStyle(color: Colors.blue)),
                     onTap: () => _launchURL(value),
                   )
                 : Text(displayValue),
