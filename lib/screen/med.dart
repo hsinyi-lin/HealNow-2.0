@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import 'med_detail.dart';
 import '../widgets/med_card.dart';
+import '../services/opendata_services.dart';
 
 class MedicationPage extends StatefulWidget {
   const MedicationPage({Key? key}) : super(key: key);
@@ -18,26 +17,10 @@ class _MedicationPageState extends State<MedicationPage> {
   List<dynamic> filteredMedications = []; // 用於儲存過濾後的資料
   String searchQuery = '';
 
-  // 呼叫藥品API
-  Future<List<Map<String, dynamic>>> fetchMedications() async {
-    final response = await http.get(Uri.parse(
-      'https://healnow.azurewebsites.net/opendatas/1',
-    ));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> medList = data['data'];
-      return medList.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('Failed to load medications');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    medications = fetchMedications().then((medList) {
+    medications = OpenDataService().fetchMedications().then((medList) {
       allMedications = medList; // 將原始資料儲存在 allMedications
       filteredMedications = medList;
       return medList;

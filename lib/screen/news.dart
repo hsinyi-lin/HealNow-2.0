@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../widgets/news_card.dart';
 import 'news_detail.dart';
+import '../services/opendata_services.dart';
+
 
 class NewsPage extends StatefulWidget {
   const NewsPage({Key? key}) : super(key: key);
@@ -18,25 +18,10 @@ class _NewsPageState extends State<NewsPage> {
   List<dynamic> filteredNews = []; // 用於儲存過濾後的資料
   String searchQuery = '';
 
-  Future<List<Map<String, dynamic>>> fetchNews() async {
-    final response = await http.get(Uri.parse(
-      'https://healnow.azurewebsites.net/opendatas/2',
-    ));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> newsList = data['data'];
-      return newsList.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('Failed to load news');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    news = fetchNews().then((newsList) {
+    news = OpenDataService().fetchNews().then((newsList) {
       allNews = newsList;
       filteredNews = newsList;
       return newsList;
@@ -49,10 +34,6 @@ class _NewsPageState extends State<NewsPage> {
       filteredNews = allNews.where((news) {
         return news['title'].toString().contains(newQuery);
       }).toList();
-      // print('-------');
-      // for (var newsItem in filteredNews) {
-      //   print(newsItem['title']);
-      // }
     });
   }
 
