@@ -65,6 +65,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                 isFavorite == true ? Icons.bookmark : Icons.bookmark_border),
             onPressed: toggleFavoriteStatus,
           ),
+          const SizedBox(width: 10),
         ],
       ),
       body: SingleChildScrollView(
