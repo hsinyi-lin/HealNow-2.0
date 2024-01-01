@@ -137,8 +137,9 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
   }
 
   Widget detailItem(IconData icon, String title, String? value) {
+    bool isUrl = value != null && value.startsWith('http');
     String displayValue = (value == null || value.isEmpty) ? '未提供' : value;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -161,10 +162,28 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.only(left: 32.0),
-            child: Text(displayValue),
+            child: isUrl
+                ? InkWell(
+                    child: Text(displayValue,
+                        style: TextStyle(color: Colors.blue)),
+                    onTap: () => _launchURL(value),
+                  )
+                : Text(displayValue),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _launchURL(String? urlString) async {
+    if (urlString == null) return;
+
+    final Uri url = Uri.parse(urlString);
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'can not open $urlString';
+    }
   }
 }
