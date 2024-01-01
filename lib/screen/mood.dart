@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:convert';
 
@@ -19,10 +20,20 @@ class _MoodPageState extends State<MoodPage> {
   Future<List<MoodDiaryEntry>>? futureEntries;
   Set<int> selectedMoods = {}; // 用於儲存選中的心情類型
 
+  late String token;
+
   @override
   void initState() {
     super.initState();
-    futureEntries = fetchMoods();
+    loadToken().then((loadedToken) {
+      token = loadedToken;
+      futureEntries = fetchMoods();
+    });
+  }
+
+  Future<String> loadToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token') ?? '';
   }
 
   // 選擇某心情的方法
@@ -36,7 +47,7 @@ class _MoodPageState extends State<MoodPage> {
     });
   }
 
-   // 用於回傳某心情資料
+  // 用於回傳某心情資料
   List<MoodDiaryEntry> filterEntries(List<MoodDiaryEntry> entries) {
     if (selectedMoods.isEmpty) {
       return entries;
@@ -48,11 +59,9 @@ class _MoodPageState extends State<MoodPage> {
 
   // 取得心情資料API
   Future<List<MoodDiaryEntry>> fetchMoods() async {
-    final response =
-        await http.get(Uri.parse('https://healnow.azurewebsites.net/moods'), headers: {
-      'Authorization':
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00',
-    });
+    final response = await http.get(
+        Uri.parse('https://healnow.azurewebsites.net/moods'),
+        headers: {'Authorization': 'Bearer $token'});
 
     if (response.statusCode == 200) {
       final List<dynamic> data =
@@ -69,12 +78,12 @@ class _MoodPageState extends State<MoodPage> {
     final response = await http.post(
       Uri.parse('https://healnow.azurewebsites.net/moods'),
       headers: {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00', // 替换为您的实际令牌
-        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
       },
       body: json.encode({'content': content}),
     );
+
     if (response.statusCode == 200) {
       scaffoldMessenger.showSnackBar(
         const SnackBar(content: Text("成功")),
@@ -88,12 +97,12 @@ class _MoodPageState extends State<MoodPage> {
     }
   }
 
-    //用滑動方式刪除
-  Future<void> deleteMoodBySlide(int moodId) async {
+  //刪除Mood
+  Future<void> deleteMood(int moodId) async {
     await http.delete(
       Uri.parse('https://healnow.azurewebsites.net/moods/$moodId'),
       headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00',
+        'Authorization': 'Bearer $token'
       },
     );
 
@@ -102,35 +111,12 @@ class _MoodPageState extends State<MoodPage> {
     });
   }
 
-  // 滑動刪除的刪除按鈕
-  Future<void> deleteMood(
-      int moodId, ScaffoldMessengerState scaffoldMessenger) async {
-    print(moodId);
-    final response = await http.delete(
-      Uri.parse('https://healnow.azurewebsites.net/moods/$moodId'),
-      headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00',
-      },
-    );
-    if (response.statusCode == 200) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("成功")),
-      );
-
-      setState(() {
-        futureEntries = fetchMoods();
-      });
-    } else {
-      print("發生錯誤：${response.statusCode}");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black), 
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           '心情',
           style: TextStyle(
@@ -196,18 +182,13 @@ class _MoodPageState extends State<MoodPage> {
                             endActionPane: ActionPane(
                               motion: const DrawerMotion(),
                               dismissible: DismissiblePane(onDismissed: () {
-                                deleteMoodBySlide(entry.id);
+                                deleteMood(entry.id);
                               }),
                               extentRatio: 0.25,
                               children: [
                                 SlidableAction(
                                   onPressed: (context) {
-                                    ScaffoldMessengerState scaffoldMessenger =
-                                        ScaffoldMessenger.of(context);
-                                    deleteMood(entry.id, scaffoldMessenger)
-                                        .then((_) {
-                                      setState(() {});
-                                    });
+                                    deleteMood(entry.id);
                                   },
                                   backgroundColor:
                                       const Color.fromARGB(255, 255, 118, 118),
