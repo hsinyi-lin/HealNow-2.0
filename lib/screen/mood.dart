@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/mood_bar.dart';
 import '../widgets/mood_diary_entry.dart';
 
 import '../services/mood_service.dart';
+import '../utils/token.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -26,13 +26,11 @@ class _MoodPageState extends State<MoodPage> {
     super.initState();
     loadToken().then((loadedToken) {
       token = loadedToken;
-      futureEntries = MoodService().fetchMoods(token);
-    });
-  }
 
-  Future<String> loadToken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') ?? '';
+      setState(() {
+        futureEntries = MoodService().fetchMoods(token);
+      });
+    });
   }
 
   // 選擇某心情的方法

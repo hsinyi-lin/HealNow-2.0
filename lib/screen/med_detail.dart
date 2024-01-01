@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/opendata_service.dart';
+import '../utils/token.dart';
+
 
 class MedicationDetailPage extends StatefulWidget {
   final Map<String, dynamic> medication;
@@ -34,11 +35,6 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
         print('Error fetching saved medications: $error');
       });
     });
-  }
-
-  Future<String> loadToken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') ?? '';
   }
 
   // 收藏狀態

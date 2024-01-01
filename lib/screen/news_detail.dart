@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/opendata_service.dart';
 import '../utils/utils.dart';
+import '../utils/token.dart';
 
 
 class NewsDetailPage extends StatefulWidget {
@@ -34,11 +34,6 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
         print('Error fetching saved news: $error');
       });
     });
-  }
-
-  Future<String> loadToken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') ?? '';
   }
 
   // 收藏狀態

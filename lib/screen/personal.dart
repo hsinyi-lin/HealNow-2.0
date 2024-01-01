@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'mood.dart';
 import 'user_screen.dart';
 import 'login.dart';
 
+import '../utils/token.dart';
 
 class PersonalPage extends StatelessWidget {
   const PersonalPage({Key? key}) : super(key: key);
@@ -14,19 +14,17 @@ class PersonalPage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(20),  // 整體邊距
+          padding: const EdgeInsets.all(20), // 整體邊距
           child: GridView.count(
             crossAxisCount: 2,
-            crossAxisSpacing: 10,  // 列間距
-            mainAxisSpacing: 10,  // 行間距
+            crossAxisSpacing: 10, // 列間距
+            mainAxisSpacing: 10, // 行間距
             childAspectRatio: 1.5, // 調整整體寬高比，使按鈕更緊湊
             children: <Widget>[
               _buildSquareButton(
                 '收藏',
                 Icons.star,
-                () {
-                  
-                },
+                () {},
               ),
               _buildSquareButton(
                 '心情',
@@ -52,8 +50,7 @@ class PersonalPage extends StatelessWidget {
                 '登出',
                 Icons.exit_to_app,
                 () async {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.remove('token');
+                  removeToken();
 
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -67,7 +64,8 @@ class PersonalPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSquareButton(String title, IconData icon, VoidCallback onPressed) {
+  Widget _buildSquareButton(
+      String title, IconData icon, VoidCallback onPressed) {
     return Container(
       padding: const EdgeInsets.all(8),
       child: ElevatedButton(
