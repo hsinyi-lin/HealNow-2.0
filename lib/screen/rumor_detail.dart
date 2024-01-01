@@ -4,7 +4,6 @@ import '../services/opendata_service.dart';
 import '../utils/utils.dart';
 import '../utils/token.dart';
 
-
 class RumorDetailPage extends StatefulWidget {
   final Map<String, dynamic> rumors;
 
@@ -39,8 +38,7 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
   // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
     try {
-      await OpenDataService().toggleFavoriteStatus(
-          token, 2, widget.rumors['id'], isFavorite ?? false);
+      await OpenDataService().toggleFavoriteStatus(token, 3, widget.rumors['id'], isFavorite ?? false);
       setState(() {
         isFavorite = !(isFavorite ?? false);
       });
@@ -65,6 +63,7 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
                 isFavorite == true ? Icons.bookmark : Icons.bookmark_border),
             onPressed: toggleFavoriteStatus,
           ),
+          const SizedBox(width: 10),
         ],
       ),
       body: SingleChildScrollView(
