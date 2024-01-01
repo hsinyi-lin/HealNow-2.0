@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
-import 'package:intl/intl.dart';
-
-
-String formatDateString(String dateString) {
-  DateFormat inputFormat = DateFormat('EEE, dd MMM yyyy HH:mm:ss \'GMT\'');
-  DateTime dateTime = inputFormat.parse(dateString, true).toLocal();
-  String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
-  return formattedDate;
-}
+import '../utils/utils.dart';
 
 
 class RumorCard extends StatelessWidget {

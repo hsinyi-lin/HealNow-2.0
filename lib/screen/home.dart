@@ -4,7 +4,6 @@ import 'news.dart';
 import 'rumor.dart';
 import 'med.dart';
 import 'pharmacy.dart';
-import 'mood.dart';
 import 'personal.dart';
 
 class HomePage extends StatefulWidget {
@@ -69,9 +68,9 @@ class _HomePageState extends State<HomePage> {
           ),
           Container(),
           // 藥局
-          PharmacyPage(),
+          const PharmacyPage(),
           // 個人
-          PersonalPage(),
+          const PersonalPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

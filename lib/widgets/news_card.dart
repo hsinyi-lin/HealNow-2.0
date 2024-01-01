@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
-
-import 'package:intl/intl.dart';
-
-
-String formatDateString(String dateString) {
-  DateFormat inputFormat = DateFormat('EEE, dd MMM yyyy HH:mm:ss \'GMT\'');
-  DateTime dateTime = inputFormat.parse(dateString, true).toLocal();
-  String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
-  return formattedDate;
-}
+import '../utils/utils.dart';
 
 
 class NewsCard extends StatelessWidget {
@@ -42,7 +32,7 @@ class NewsCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 97, 97, 97), 
+                color: const Color.fromARGB(255, 97, 97, 97), 
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Text(

@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/opendata_service.dart';
+import '../utils/utils.dart';
 
-String formatDateString(String dateString) {
-  DateFormat inputFormat = DateFormat('EEE, dd MMM yyyy HH:mm:ss \'GMT\'');
-  DateTime dateTime = inputFormat.parse(dateString, true).toLocal();
-  String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
-  return formattedDate;
-}
 
 class NewsDetailPage extends StatefulWidget {
   final Map<String, dynamic> news;
@@ -127,24 +120,12 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                 ? InkWell(
                     child: Text(displayValue,
                         style: const TextStyle(color: Colors.blue)),
-                    onTap: () => _launchURL(value),
+                    onTap: () => launchURL(value),
                   )
                 : Text(displayValue),
           ),
         ],
       ),
     );
-  }
-
-  Future<void> _launchURL(String? urlString) async {
-    if (urlString == null) return;
-
-    final Uri url = Uri.parse(urlString);
-
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'can not open $urlString';
-    }
   }
 }
