@@ -46,6 +46,9 @@ dependencies:
   google_maps_cluster_manager: ^3.0.0+1
   flutter_slidable: ^3.0.1
   image_picker: ^1.0.5
+  flutter_markdown: ^0.6.6 #markdown渲染
+  flutter_markdown_editor: ^2.0.0
+  date_format: ^2.0.4 
 
 dev_dependencies:
   flutter_test:

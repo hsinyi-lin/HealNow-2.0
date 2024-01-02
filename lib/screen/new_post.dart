@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class NewPostScreen extends StatefulWidget {
   @override
@@ -20,10 +21,21 @@ class _NewPostScreenState extends State<NewPostScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              '您的帳號: 振閔',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
                 hintText: '標題',
+                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Color.fromARGB(255, 234, 234, 234),
               ),
             ),
             SizedBox(height: 20),
@@ -32,7 +44,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
-                hintText: '內容',
+                hintText: '內容 (支援 Markdown)',
+                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Color.fromARGB(255, 234, 234, 234),
               ),
             ),
             SizedBox(height: 20),
@@ -51,10 +66,15 @@ class _NewPostScreenState extends State<NewPostScreen> {
               },
               child: Text('發布貼文'),
             ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Markdown(
+                data: _contentController.text,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
