@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_app/screen/social.dart';
 
 import 'news.dart';
 import 'rumor.dart';
@@ -54,7 +55,8 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Container(),
+          //社群
+          SocialPage(),
           // 藥局
           PharmacyPage(),
           // 收藏(未來需移動至個人)
