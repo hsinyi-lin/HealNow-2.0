@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:intl/intl.dart';
+
+import '../services/opendata_service.dart';
+import '../utils/token.dart';
+
 
 class MedicationDetailPage extends StatefulWidget {
   final Map<String, dynamic> medication;
@@ -14,77 +16,37 @@ class MedicationDetailPage extends StatefulWidget {
 }
 
 class _MedicationDetailPageState extends State<MedicationDetailPage> {
+  late String token;
   bool? isFavorite;
 
   @override
   void initState() {
     super.initState();
+    loadToken().then((loadedToken) {
+      token = loadedToken; // 在 Future 完成後設置 token
 
-    // 取得收藏列表進行比對，以顯示收藏icon類型
-    fetchSavedMedications().then((savedMedications) {
-      setState(() {
-        isFavorite = savedMedications
-            .any((savedMed) => savedMed['id'] == widget.medication['id']);
+      // 取得收藏列表進行比對，以顯示收藏 icon 類型
+      OpenDataService().fetchSavedClassList(token, 1).then((savedMedications) {
+        setState(() {
+          isFavorite = savedMedications
+              .any((savedMed) => savedMed['id'] == widget.medication['id']);
+        });
+      }).catchError((error) {
+        print('Error fetching saved medications: $error');
       });
-    }).catchError((error) {
-      print('Error fetching saved medications: $error');
     });
   }
 
-  // 取得收藏列表
-  Future<List<dynamic>> fetchSavedMedications() async {
-    final url = Uri.parse('https://healnow.azurewebsites.net/opendatas/save_class/1');
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00";
-
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data'];
-      return data.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('Failed to load saved medications');
-    }
-  }
-
+  // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
-    final url = Uri.parse(
-        'https://healnow.azurewebsites.net/opendatas/save_class/1/${widget.medication['id']}');
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjMwMTE5MywianRpIjoiYTIzOTkzZjEtNTNmNy00MWE1LTg5NWQtNmY2ZGU5NWNiNmIyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjExMTM2MDA0QG50dWIuZWR1LnR3IiwibmJmIjoxNzAyMzAxMTkzLCJleHAiOjE3MDc0ODUxOTN9.4C9f_WxW5uV2JqnOUrK1AidGiQ5hzzr3AnXxPQ5ak00";
-
-    http.Response response;
-
-    // 如果 isFavorite 是 true，執行移除收藏
-    if (isFavorite == true) {
-      response = await http.delete(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-    } else {
-      // 如果 isFavorite 是 false，執行新增收藏
-      response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-    }
-
-    if (response.statusCode == 200) {
+    try {
+      await OpenDataService().toggleFavoriteStatus(
+          token, 1, widget.medication['id'], isFavorite ?? false);
       setState(() {
-        // 改變收藏icon
         isFavorite = !(isFavorite ?? false);
       });
-    } else {
-      print('Error updating favorite status');
+    } catch (error) {
+      print('Error updating favorite status: $error');
     }
   }
 

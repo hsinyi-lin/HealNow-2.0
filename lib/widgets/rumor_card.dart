@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+
 import '../utils/utils.dart';
 
 
-class NewsCard extends StatelessWidget {
-  final String newsDate;
-  final String newsTitle;
-  final String newsContent;
+class RumorCard extends StatelessWidget {
+  final String rumorDate;
+  final String rumorTitle;
+  final String rumorContent;
   final Function onTap;
 
-  const NewsCard({
-    required this.newsDate,
-    required this.newsTitle,
-    required this.newsContent,
+  const RumorCard({
+    required this.rumorDate,
+    required this.rumorTitle,
+    required this.rumorContent,
     required this.onTap,
   });
 
@@ -32,11 +33,11 @@ class NewsCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 97, 97, 97), 
+                color: Color.fromARGB(255, 97, 97, 97), 
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Text(
-                formatDateString(newsDate),
+                formatDateString(rumorDate),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
@@ -46,7 +47,7 @@ class NewsCard extends StatelessWidget {
             const SizedBox(height: 6), 
             // title
             Text(
-              newsTitle,
+              rumorTitle,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -55,7 +56,7 @@ class NewsCard extends StatelessWidget {
             const Divider(),
             // content
             Text(
-              newsContent,
+              rumorContent,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

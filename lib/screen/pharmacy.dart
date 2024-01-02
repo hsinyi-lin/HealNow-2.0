@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/opendata_service.dart';
+
 
 class Place with ClusterItem {
   final String name;
@@ -50,24 +50,9 @@ class MapSampleState extends State<PharmacyPage> {
   final CameraPosition _cameraPosition =
       const CameraPosition(target: LatLng(25.0423168, 121.5255206), zoom: 12.0);
 
-  Future<List<Map<String, dynamic>>> fetchPharmacies() async {
-    final response = await http.get(Uri.parse(
-      'https://healnow.azurewebsites.net/opendatas/4',
-    ));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> recipeList = data['data'];
-      return recipeList.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('Failed to load pharmacies');
-    }
-  }
-
   Future<void> _fetchAndSetPharmacies() async {
     try {
-      List<Map<String, dynamic>> pharmacyData = await fetchPharmacies();
+      List<Map<String, dynamic>> pharmacyData = await OpenDataService().fetchPharmacies();
       print('adding markers...');
       List<Place> pharmacyPlaces = pharmacyData.map((pharmacy) {
         return Place(
@@ -220,7 +205,7 @@ class MapSampleState extends State<PharmacyPage> {
 
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint1 = Paint()..color = Color.fromARGB(255, 165, 207, 40);
+    final Paint paint1 = Paint()..color = const Color.fromARGB(255, 165, 207, 40);
     final Paint paint2 = Paint()..color = Colors.white;
 
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);

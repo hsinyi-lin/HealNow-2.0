@@ -4,17 +4,16 @@ import '../services/opendata_service.dart';
 import '../utils/utils.dart';
 import '../utils/token.dart';
 
+class RumorDetailPage extends StatefulWidget {
+  final Map<String, dynamic> rumors;
 
-class NewsDetailPage extends StatefulWidget {
-  final Map<String, dynamic> news;
-
-  const NewsDetailPage({Key? key, required this.news}) : super(key: key);
+  const RumorDetailPage({Key? key, required this.rumors}) : super(key: key);
 
   @override
-  State<NewsDetailPage> createState() => _NewsDetailPageState();
+  State<RumorDetailPage> createState() => _NewsDetailPageState();
 }
 
-class _NewsDetailPageState extends State<NewsDetailPage> {
+class _NewsDetailPageState extends State<RumorDetailPage> {
   late String token;
   bool? isFavorite;
 
@@ -25,13 +24,13 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
     loadToken().then((loadedToken) {
       token = loadedToken;
 
-      OpenDataService().fetchSavedClassList(token, 2).then((savedNews) {
+      OpenDataService().fetchSavedClassList(token, 3).then((savedRumors) {
         setState(() {
-          isFavorite = savedNews
-              .any((savedOneNews) => savedOneNews['id'] == widget.news['id']);
+          isFavorite = savedRumors
+              .any((savedRumor) => savedRumor['id'] == widget.rumors['id']);
         });
       }).catchError((error) {
-        print('Error fetching saved news: $error');
+        print('Error fetching saved rumors: $error');
       });
     });
   }
@@ -39,8 +38,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
   // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
     try {
-      await OpenDataService().toggleFavoriteStatus(
-          token, 2, widget.news['id'], isFavorite ?? false);
+      await OpenDataService().toggleFavoriteStatus(token, 3, widget.rumors['id'], isFavorite ?? false);
       setState(() {
         isFavorite = !(isFavorite ?? false);
       });
@@ -55,7 +53,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text(
-          '新聞內容',
+          '闢謠內容',
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
@@ -73,13 +71,13 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            detailItem(Icons.star_half, widget.news['title'],
-                formatDateString(widget.news['publish_date'])),
-            const Divider(),
+            detailItem(Icons.star_half, widget.rumors['title'],
+                formatDateString(widget.rumors['publish_date'])),
+            Divider(),
             detailItem(Icons.my_library_books, '內文',
-                widget.news['content'].replaceAll('。 ', '。\n\n')),
-            const Divider(),
-            detailItem(Icons.language, '連結', widget.news['url']),
+                widget.rumors['content'].replaceAll('。 ', '。\n\n')),
+            Divider(),
+            detailItem(Icons.language, '連結', widget.rumors['url']),
           ],
         ),
       ),

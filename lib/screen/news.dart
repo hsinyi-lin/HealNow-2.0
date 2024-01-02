@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../widgets/news_card.dart';
 import 'news_detail.dart';
+import '../services/opendata_service.dart';
+
 
 class NewsPage extends StatefulWidget {
   const NewsPage({Key? key}) : super(key: key);
@@ -14,26 +14,27 @@ class NewsPage extends StatefulWidget {
 
 class _NewsPageState extends State<NewsPage> {
   Future<List<dynamic>>? news;
-
-  Future<List<Map<String, dynamic>>> fetchNews() async {
-    final response = await http.get(Uri.parse(
-      'http://127.0.0.1:5000/opendatas/2',
-    ));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final List<dynamic> recipeList = data['data'];
-      return recipeList.map((json) => json as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('Failed to load news');
-    }
-  }
+  List<dynamic> allNews = []; // 用於儲存所有資料
+  List<dynamic> filteredNews = []; // 用於儲存過濾後的資料
+  String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    news = fetchNews();
+    news = OpenDataService().fetchNews().then((newsList) {
+      allNews = newsList;
+      filteredNews = newsList;
+      return newsList;
+    });
+  }
+
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+      filteredNews = allNews.where((news) {
+        return news['title'].toString().contains(newQuery);
+      }).toList();
+    });
   }
 
   @override
@@ -45,16 +46,17 @@ class _NewsPageState extends State<NewsPage> {
           children: <Widget>[
             const SizedBox(height: 20),
             TextField(
+              onChanged: updateSearchQuery,
               decoration: InputDecoration(
                 hintText: '名稱',
                 prefixIcon: const Icon(Icons.search),
-                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 filled: true,
-                fillColor: Color.fromARGB(255, 234, 234, 234),
+                fillColor: const Color.fromARGB(255, 234, 234, 234),
               ),
             ),
             const SizedBox(height: 20),
@@ -68,19 +70,20 @@ class _NewsPageState extends State<NewsPage> {
                     return Text('Error: ${snapshot.error}');
                   } else {
                     return ListView.separated(
-                      itemCount: snapshot.data!.length,
-                      separatorBuilder: (context, index) => Divider(),
+                      itemCount: filteredNews.length,
+                      separatorBuilder: (context, index) => const Divider(),
                       itemBuilder: (context, index) {
-                        var item = snapshot.data![index];
+                        var item = filteredNews[index];
                         return NewsCard(
                           newsDate: item['publish_date'],
                           newsTitle: item['title'],
                           newsContent: item['content'],
                           onTap: () {
                             Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => NewsDetailPage(news: item),
-                            ),
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NewsDetailPage(news: item),
+                              ),
                             );
                           },
                         );

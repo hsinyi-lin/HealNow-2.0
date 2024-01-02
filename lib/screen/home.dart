@@ -5,7 +5,7 @@ import 'news.dart';
 import 'rumor.dart';
 import 'med.dart';
 import 'pharmacy.dart';
-
+import 'personal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -27,6 +27,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child: Image.asset(
+            'assets/images/healnow.png',
+            height: AppBar().preferredSize.height * 0.8,
+            fit: BoxFit.contain,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.grey),
+        elevation: 0,
+      ),
       body: IndexedStack(
         index: _currentIndex,
         children: <Widget>[
@@ -58,11 +70,9 @@ class _HomePageState extends State<HomePage> {
           //社群
           SocialPage(),
           // 藥局
-          PharmacyPage(),
-          // 收藏(未來需移動至個人)
-          Container(),
+          const PharmacyPage(),
           // 個人
-          Container(),
+          const PersonalPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -74,7 +84,6 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '首頁'),
           BottomNavigationBarItem(icon: Icon(Icons.group), label: '社群'),
           BottomNavigationBarItem(icon: Icon(Icons.local_pharmacy_outlined), label: '藥局'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_pharmacy_outlined), label: '收藏'),  // 未來需移動至個人
           BottomNavigationBarItem(icon: Icon(Icons.person_4_rounded), label: '個人'),
         ],
       ),
