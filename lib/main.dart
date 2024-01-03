@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screen/home.dart';
 import 'screen/login.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -28,7 +27,8 @@ class MyAppHome extends StatefulWidget {
 }
 
 class _MyAppHomeState extends State<MyAppHome> {
-  late bool isLoggedIn;
+  bool isLoggedIn = false;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -41,11 +41,17 @@ class _MyAppHomeState extends State<MyAppHome> {
     String? storedToken = prefs.getString('token');
     setState(() {
       isLoggedIn = storedToken != null && storedToken.isNotEmpty;
+      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return isLoggedIn ? const HomePage() : LoginScreen();
   }
 }
