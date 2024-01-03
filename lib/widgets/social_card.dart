@@ -11,37 +11,75 @@ class PostCard extends StatelessWidget {
   final String updated_time;
   final Function onTap;
 
-const PostCard({
+  const PostCard({
     required this.id,
     required this.title,
-    required this.onTap, 
-    required this.content, 
-    required this.email, 
-    required this.username, 
-    required this.created_time, 
+    required this.onTap,
+    required this.content,
+    required this.email,
+    required this.username,
+    required this.created_time,
     required this.updated_time,
   });
-  
-@override
+
+  @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), // 調整垂直和水平間距
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0), // 設置圓角半徑
+        borderRadius: BorderRadius.circular(12.0),
       ),
-      elevation: 4, // 添加陰影效果
+      elevation: 4,
       child: ListTile(
-        contentPadding: const EdgeInsets.all(12), // 調整內容填充
+        contentPadding: const EdgeInsets.all(12),
         leading: CircleAvatar(
-          backgroundColor: Colors.black, // 設置圓形頭像的背景色
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
+          backgroundColor: Colors.black,
+          child: Text(
+            username.isNotEmpty ? username[0].toUpperCase() : '?',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        subtitle: Text(content),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '發文者: $username',
+              style: TextStyle(
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(content),
+            const SizedBox(height: 4),
+            Text(
+              '發布時間: $created_time',
+              style: TextStyle(
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.favorite_border),
+          onPressed: () {
+            // 在這裡處理收藏按鈕的操作
+            // 可以調用一個收藏功能的函數
+          },
+        ),
         onTap: () => onTap(),
       ),
     );
