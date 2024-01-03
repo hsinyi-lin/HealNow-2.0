@@ -41,8 +41,8 @@ class _HomePageState extends State<HomePage> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: <Widget>[
-          const DefaultTabController(
+        children: const <Widget>[
+          DefaultTabController(
             length: 3,  
             child: Column(
               children: <Widget>[
@@ -70,9 +70,9 @@ class _HomePageState extends State<HomePage> {
           //社群
           SocialPage(),
           // 藥局
-          const PharmacyPage(),
+          PharmacyPage(),
           // 個人
-          const PersonalPage(),
+          PersonalPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

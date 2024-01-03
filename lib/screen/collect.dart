@@ -4,7 +4,9 @@ import 'news.dart';
 import 'rumor.dart';
 import 'med.dart';
 import 'pharmacy.dart';
-import 'collect_other.dart';
+import 'collect_med.dart';
+import 'collect_news.dart';
+import 'collect_rumor.dart';
 import 'collect_post.dart';
 
 class CollectPage extends StatefulWidget {
@@ -27,26 +29,40 @@ class _CollectPageState extends State<CollectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text(
+          '收藏',
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: IndexedStack(
         index: _currentIndex,
         children: <Widget>[
           DefaultTabController(
-            length: 2,
+            length: 4,
             child: Column(
               children: <Widget>[
                 const TabBar(
                   labelColor: Colors.black,
                   indicatorColor: Colors.black,
                   tabs: [
-                    Tab(icon: Icon(Icons.medication), text: '貼文'),
-                    Tab(icon: Icon(Icons.newspaper), text: '其他'),
+                    Tab(icon: Icon(Icons.bookmark), text: '藥品'),
+                    Tab(icon: Icon(Icons.bookmark), text: '新聞'),
+                    Tab(icon: Icon(Icons.bookmark), text: '闢謠'),
+                    Tab(icon: Icon(Icons.bookmark), text: '貼文'),
                   ],
                 ),
                 Expanded(
                   child: TabBarView(
                     children: [
+                      CollectMedPage(),
+                      CollectNewsPage(),
+                      CollectRumorPage(),
                       CollectPostPage(),
-                      CollectOtherPage(),
                     ],
                   ),
                 ),
