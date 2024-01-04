@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'mood.dart';
 import 'user_screen.dart';
 import 'login.dart';
-
+import 'collect.dart';
 import '../utils/token.dart';
 
 class PersonalPage extends StatelessWidget {
@@ -24,7 +24,12 @@ class PersonalPage extends StatelessWidget {
               _buildSquareButton(
                 '收藏',
                 Icons.star,
-                () {},
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CollectPage()),
+                  );
+                },
               ),
               _buildSquareButton(
                 '心情',
