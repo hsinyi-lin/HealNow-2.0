@@ -17,13 +17,30 @@ class SocialDetailPage extends StatefulWidget {
 class _SocialDetailPageState extends State<SocialDetailPage> {
   late String token;
   bool? isFavorite;
-  late Map<String, dynamic> postDetails;
+  late Map<String, dynamic> postDetails = {};
 
   @override
   void initState() {
     super.initState();
     loadToken().then((loadedToken) {
       token = loadedToken;
+
+      // 取得貼文詳細資訊的 API 請求
+    Future<Map<String, dynamic>> fetchPostDetails(int postId, String token) async {
+      final response = await http.get(
+        Uri.parse('https://healnow.azurewebsites.net/posts/$postId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data =
+            json.decode(const Utf8Decoder().convert(response.bodyBytes));
+        final Map<String, dynamic> postDetails = data['data'];
+        return postDetails;
+      } else {
+        throw Exception('Failed to load post details');
+      }
+    }
 
       // 取得貼文詳細資訊
       fetchPostDetails(widget.postId, token).then((details) {
@@ -38,24 +55,10 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       // 這部分的程式碼和之前的一樣
     });
   }
+  
 
-  // 取得貼文詳細資訊的 API 請求
-  Future<Map<String, dynamic>> fetchPostDetails(int postId, String token) async {
-    final response = await http.get(
-      Uri.parse('https://healnow.azurewebsites.net/posts/$postId'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(const Utf8Decoder().convert(response.bodyBytes));
-      final Map<String, dynamic> postDetails = data['data'];
-      return postDetails;
-    } else {
-      throw Exception('Failed to load post details');
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     if (postDetails == null) {

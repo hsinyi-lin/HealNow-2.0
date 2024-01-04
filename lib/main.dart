@@ -33,6 +33,8 @@ class _MyAppHomeState extends State<MyAppHome> {
   @override
   void initState() {
     super.initState();
+    // 在這裡進行 isLoggedIn 的初始化
+    isLoggedIn = false; // 或者根據你的邏輯賦予初值
     _checkLoginStatus();
   }
 
