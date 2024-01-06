@@ -107,7 +107,6 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.only(left: 32.0),
             child: isUrl
