@@ -156,6 +156,8 @@ class MapSampleState extends State<PharmacyPage> {
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 97, 97, 97), 
             ),
+            softWrap: true,
+            overflow: TextOverflow.visible,
           ),
           content: SingleChildScrollView(
             child: ListBody(
