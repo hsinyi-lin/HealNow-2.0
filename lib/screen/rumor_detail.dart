@@ -38,7 +38,8 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
   // 收藏狀態
   Future<void> toggleFavoriteStatus() async {
     try {
-      await OpenDataService().toggleFavoriteStatus(token, 3, widget.rumors['id'], isFavorite ?? false);
+      await OpenDataService().toggleFavoriteStatus(
+          token, 3, widget.rumors['id'], isFavorite ?? false);
       setState(() {
         isFavorite = !(isFavorite ?? false);
       });
@@ -73,10 +74,10 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
           children: <Widget>[
             detailItem(Icons.star_half, widget.rumors['title'],
                 formatDateString(widget.rumors['publish_date'])),
-            Divider(),
+            const Divider(),
             detailItem(Icons.my_library_books, '內文',
                 widget.rumors['content'].replaceAll('。 ', '。\n\n')),
-            Divider(),
+            const Divider(),
             detailItem(Icons.language, '連結', widget.rumors['url']),
           ],
         ),
@@ -90,32 +91,37 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            children: [
-              Icon(icon),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+          Icon(icon),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 32.0),
-            child: isUrl
-                ? InkWell(
-                    child: Text(displayValue,
-                        style: const TextStyle(color: Colors.blue)),
-                    onTap: () => launchURL(value),
-                  )
-                : Text(displayValue),
+                isUrl
+                    ? InkWell(
+                        child: Text(
+                          displayValue,
+                          style: const TextStyle(color: Colors.blue),
+                          softWrap: true,
+                        ),
+                        onTap: () => launchURL(value),
+                      )
+                    : Text(
+                        displayValue,
+                        softWrap: true,
+                      ),
+              ],
+            ),
           ),
         ],
       ),
