@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../services/opendata_service.dart';
 import '../utils/token.dart';
+import '../utils/utils.dart';
 
 
 class MedicationDetailPage extends StatefulWidget {
@@ -145,11 +145,4 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
       ),
     );
   }
-}
-
-String formatDateString(String dateString) {
-  DateFormat inputFormat = DateFormat('EEE, dd MMM yyyy HH:mm:ss \'GMT\'');
-  DateTime dateTime = inputFormat.parse(dateString, true).toLocal();
-  String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
-  return formattedDate;
 }
