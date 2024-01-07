@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'mood.dart';
 import 'user_screen.dart';
 import 'login.dart';
-import 'collect.dart';
+//import 'collect.dart'; //先註解掉
 import '../utils/token.dart';
 
 class PersonalPage extends StatelessWidget {
@@ -27,7 +27,9 @@ class PersonalPage extends StatelessWidget {
                 () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const CollectPage()),
+                    //先用container代替
+                    // MaterialPageRoute(builder: (context) => const CollectPage()),
+                    MaterialPageRoute(builder: (context) =>  Container()),
                   );
                 },
               ),
