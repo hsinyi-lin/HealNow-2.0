@@ -92,33 +92,37 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            children: [
-              Icon(icon),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+          Icon(icon),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Padding(
-            padding: const EdgeInsets.only(left: 32.0),
-            child: isUrl
-                ? InkWell(
-                    child: Text(displayValue,
-                        style: const TextStyle(color: Colors.blue)),
-                    onTap: () => launchURL(value),
-                  )
-                : Text(displayValue),
+                isUrl
+                    ? InkWell(
+                        child: Text(
+                          displayValue,
+                          style: const TextStyle(color: Colors.blue),
+                          softWrap: true,
+                        ),
+                        onTap: () => launchURL(value),
+                      )
+                    : Text(
+                        displayValue,
+                        softWrap: true,
+                      ),
+              ],
+            ),
           ),
         ],
       ),
