@@ -8,28 +8,7 @@ import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../services/opendata_service.dart';
-
-
-class Place with ClusterItem {
-  final String name;
-  final String fullAddress;
-  final String leaderName;
-  final String gender;
-  final String phone;
-  final LatLng latLng;
-
-  Place({
-    required this.name, 
-    required this.fullAddress, 
-    required this.leaderName, 
-    required this.gender, 
-    required this.phone, 
-    required this.latLng
-  });
-
-  @override
-  LatLng get location => latLng;
-}
+import '../widgets/place.dart';
 
 
 class PharmacyPage extends StatefulWidget {
@@ -49,6 +28,13 @@ class MapSampleState extends State<PharmacyPage> {
 
   final CameraPosition _cameraPosition =
       const CameraPosition(target: LatLng(25.0423168, 121.5255206), zoom: 12.0);
+
+  @override
+  void initState() {
+    _manager = _initClusterManager();
+    super.initState();
+    _fetchAndSetPharmacies();
+  }
 
   Future<void> _fetchAndSetPharmacies() async {
     try {
@@ -76,13 +62,6 @@ class MapSampleState extends State<PharmacyPage> {
     } catch (e) {
       print('Error fetching pharmacies: $e');
     }
-  }
-
-  @override
-  void initState() {
-    _manager = _initClusterManager();
-    super.initState();
-    _fetchAndSetPharmacies();
   }
 
   ClusterManager _initClusterManager() {
@@ -156,6 +135,8 @@ class MapSampleState extends State<PharmacyPage> {
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 97, 97, 97), 
             ),
+            softWrap: true,
+            overflow: TextOverflow.visible,
           ),
           content: SingleChildScrollView(
             child: ListBody(

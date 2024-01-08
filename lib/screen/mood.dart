@@ -76,7 +76,10 @@ class _MoodPageState extends State<MoodPage> {
             children: [
               const SizedBox(width: 16),
               FilterChip(
-                label: const Text('正向'),
+                label: const Text(
+                  '正向',
+                  textAlign: TextAlign.center,
+                ),
                 selected: selectedMoods.contains(1),
                 onSelected: (bool selected) {
                   toggleSelectedMood(1);
@@ -84,7 +87,10 @@ class _MoodPageState extends State<MoodPage> {
               ),
               const SizedBox(width: 8),
               FilterChip(
-                label: const Text('中立'),
+                label: const Text(
+                  '中立',
+                  textAlign: TextAlign.center,
+                ),
                 selected: selectedMoods.contains(2),
                 onSelected: (bool selected) {
                   toggleSelectedMood(2);
@@ -92,7 +98,10 @@ class _MoodPageState extends State<MoodPage> {
               ),
               const SizedBox(width: 8),
               FilterChip(
-                label: const Text('負向'),
+                label: const Text(
+                  '負向',
+                  textAlign: TextAlign.center,
+                ),
                 selected: selectedMoods.contains(3),
                 onSelected: (bool selected) {
                   toggleSelectedMood(3);

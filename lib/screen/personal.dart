@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'mood.dart';
 import 'user_screen.dart';
 import 'login.dart';
-//import 'collect.dart'; //先註解掉
 import '../utils/token.dart';
 
 class PersonalPage extends StatelessWidget {
@@ -19,18 +18,13 @@ class PersonalPage extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 10, // 列間距
             mainAxisSpacing: 10, // 行間距
-            childAspectRatio: 1.5, // 調整整體寬高比，使按鈕更緊湊
+            childAspectRatio: 1, // 調整整體寬高比，使按鈕更緊湊
             children: <Widget>[
               _buildSquareButton(
                 '收藏',
                 Icons.star,
                 () {
-                  Navigator.push(
-                    context,
-                    //先用container代替
-                    // MaterialPageRoute(builder: (context) => const CollectPage()),
-                    MaterialPageRoute(builder: (context) =>  Container()),
-                  );
+                 
                 },
               ),
               _buildSquareButton(
@@ -44,7 +38,7 @@ class PersonalPage extends StatelessWidget {
                 },
               ),
               _buildSquareButton(
-                '個人資料',
+                '我的資料',
                 Icons.person,
                 () {
                   Navigator.push(

@@ -15,53 +15,63 @@ class NewsCard extends StatelessWidget {
     required this.onTap,
   });
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 4,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // date 
-            Container(
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 97, 97, 97), 
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                formatDateString(newsDate),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
+      shadowColor: Colors.grey.withOpacity(0.5),
+      child: InkWell(
+        onTap: () => onTap(),
+        borderRadius: BorderRadius.circular(15.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Date
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                decoration: BoxDecoration(
+                  // color: Colors.blue.shade300,
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  formatDateString(newsDate),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 6), 
-            // title
-            Text(
-              newsTitle,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 10),
+              // Title
+              Text(
+                newsTitle,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
-            ),
-            const SizedBox(height: 8), 
-            const Divider(),
-            // content
-            Text(
-              newsContent,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              const SizedBox(height: 8),
+              const Divider(),
+              // Content
+              Text(
+                newsContent,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
         ),
-        onTap: () => onTap(),
       ),
     );
   }
