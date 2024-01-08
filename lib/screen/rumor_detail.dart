@@ -64,7 +64,6 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
                 isFavorite == true ? Icons.bookmark : Icons.bookmark_border),
             onPressed: toggleFavoriteStatus,
           ),
-          const SizedBox(width: 10),
         ],
       ),
       body: SingleChildScrollView(
@@ -107,6 +106,7 @@ class _NewsDetailPageState extends State<RumorDetailPage> {
                     fontSize: 16,
                   ),
                 ),
+                const SizedBox(width: 4),
                 isUrl
                     ? InkWell(
                         child: Text(
