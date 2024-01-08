@@ -26,6 +26,7 @@ class _CollectPageState extends State<CollectPage> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

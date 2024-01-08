@@ -57,6 +57,8 @@ class _CollectRumorPageState extends State<CollectRumorPage> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
+                    } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('沒有收藏'));
                   } else {
                     return ListView.separated(
                       itemCount: filteredRumors.length,
