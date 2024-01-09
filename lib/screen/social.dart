@@ -1,3 +1,5 @@
+// SocialPage.dart
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -15,6 +17,7 @@ class SocialPage extends StatefulWidget {
 class _SocialPage extends State<SocialPage> {
   Future<List<Map<String, dynamic>>>? posts;
 
+  // 非同步函數：發送 API 請求取得貼文列表
   Future<List<Map<String, dynamic>>> fetchPosts() async {
     final response = await http.get(Uri.parse(
       'https://healnow.azurewebsites.net/posts',
@@ -33,7 +36,14 @@ class _SocialPage extends State<SocialPage> {
   @override
   void initState() {
     super.initState();
-    posts = fetchPosts();
+    posts = fetchPosts(); // 在初始化時取得貼文列表
+  }
+
+  // 新增一個刷新貼文的函數
+  Future<void> _refreshPosts() async {
+    setState(() {
+      posts = fetchPosts(); // 重新獲取貼文列表
+    });
   }
 
   @override
@@ -44,6 +54,7 @@ class _SocialPage extends State<SocialPage> {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 20),
+            // 搜尋框
             TextField(
               decoration: InputDecoration(
                 hintText: '名稱',
@@ -58,6 +69,7 @@ class _SocialPage extends State<SocialPage> {
               ),
             ),
             const SizedBox(height: 20),
+            // 貼文列表
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: posts,
@@ -99,11 +111,14 @@ class _SocialPage extends State<SocialPage> {
           ],
         ),
       ),
+      // 新增貼文按鈕
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => NewPostScreen()),
+            MaterialPageRoute(
+              builder: (context) => NewPostScreen(refreshCallback: _refreshPosts),
+              ),
           );
         },
         child: Icon(Icons.add),
