@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 
 class CommentCard extends StatelessWidget {
   final int id;
+  final String username;
+  final String email;
   final String content;
   final String createdTime;
   final String updatedTime;
 
   const CommentCard({
     required this.id,
+    required this.username,
+    required this.email,
     required this.content,
     required this.createdTime,
     required this.updatedTime,

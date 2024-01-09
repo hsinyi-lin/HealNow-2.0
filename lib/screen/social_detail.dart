@@ -15,12 +15,11 @@ class SocialDetailPage extends StatefulWidget {
   State<SocialDetailPage> createState() => _SocialDetailPageState();
 }
 
-
 class _SocialDetailPageState extends State<SocialDetailPage> {
   late String token;
   bool? isFavorite;
   late Map<String, dynamic> postDetails = {};
-  late List<Map<String, dynamic>> comments = []; // 新增 comments 變數
+  late List<dynamic> comments = []; // 新增 comments 變數
   late TextEditingController commentController;
 
   @override
@@ -31,11 +30,11 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       token = loadedToken;
 
       // 取得貼文詳細資訊的 API 請求
-      fetchPostDetails(widget.postId, token).then((details) {
+      fetchPostDetails(widget.postId).then((details) {
         setState(() {
           postDetails = details;
           // 將留言列表放入 comments 變數中
-          comments = details['data']['comment'] ?? [];
+          comments = details['comment'] ?? [];
         });
       }).catchError((error) {
         print('Error fetching post details: $error');
@@ -44,25 +43,22 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
   }
 
   // 取得貼文詳細資訊的 API 請求
-  Future<Map<String, dynamic>> fetchPostDetails(
-      int postId, String token) async {
-    final response = await http.get(
-      Uri.parse('https://healnow.azurewebsites.net/posts/$postId'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+  Future<Map<String, dynamic>> fetchPostDetails(int postId) async {
+    final response = await http
+        .get(Uri.parse('https://healnow.azurewebsites.net/posts/$postId'));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data =
           json.decode(const Utf8Decoder().convert(response.bodyBytes));
       final Map<String, dynamic> postDetails = data['data'];
+      print(postDetails);
       return postDetails;
     } else {
       throw Exception('Failed to load post details');
     }
   }
-  }
 
-  // 新增留言的 API 請求
+// 新增留言的 API 請求
   Future<bool> addComment(int postId, String token, String content) async {
     final response = await http.post(
       Uri.parse('https://healnow.azurewebsites.net/comments/$postId'),
@@ -83,25 +79,25 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-  if (postDetails.isEmpty) {
-    // 資訊還在載入中，顯示載入中的畫面
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('貼文詳細資訊'),
-      ),
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  } else {
-    // 資訊已經載入完成，顯示貼文詳細資訊
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('貼文詳細資訊'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Container(
+    if (postDetails.isEmpty) {
+      // 資訊還在載入中，顯示載入中的畫面
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('貼文詳細資訊'),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else {
+      // 資訊已經載入完成，顯示貼文詳細資訊
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('貼文詳細資訊'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -162,14 +158,14 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                       children: [
                         Icon(Icons.thumb_up),
                         SizedBox(width: 8),
-                        Text('點讚數: ${postDetails['like_count']}'),
+                        Text('點讚數: ${postDetails['like_cnt']}'),
                       ],
                     ),
                     Row(
                       children: [
                         Icon(Icons.remove_red_eye),
                         SizedBox(width: 8),
-                        Text('觀看次數: ${postDetails['view_count']}'),
+                        Text('收藏次數: ${postDetails['saved_cnt']}'),
                       ],
                     ),
                   ],
@@ -193,33 +189,7 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                 SizedBox(height: 10),
                 // ElevatedButton 用於提交留言
                 ElevatedButton(
-                  onPressed: () async {
-                    // 點擊按鈕時提交留言
-                    final content = commentController.text;
-                    if (content.isNotEmpty) {
-                      final success = await addComment(
-                        widget.postId,
-                        token,
-                        content,
-                      );
-                      if (success) {
-                        // 留言成功後重新載入留言列表
-                        final updatedComments =
-                            await fetchComments(widget.postId, token);
-                        setState(() {
-                          comments = updatedComments;
-                          commentController.clear(); // 清空輸入框
-                        });
-                      } else {
-                        // 留言失敗，顯示錯誤訊息
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('留言失敗'),
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  onPressed: () async {},
                   child: Text('留言'),
                 ),
                 SizedBox(height: 20),
@@ -229,11 +199,16 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                   itemCount: comments.length,
                   itemBuilder: (context, index) {
                     final comment = comments[index];
+                    print('-----------------');
+                    print(comment);
+
                     return CommentCard(
-                      id: comment['username'],
+                      id: comment['id'],
+                      username: comment['username'],
+                      email: comment['email'],
                       content: comment['content'],
-                      createdTime: comment['created_time'], 
-                      updatedTime: '',
+                      createdTime: comment['created_time'],
+                      updatedTime: comment['updated_time'],
                     );
                   },
                 ),
@@ -244,4 +219,4 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       );
     }
   }
-
+}
