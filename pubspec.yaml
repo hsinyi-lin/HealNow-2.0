@@ -49,6 +49,7 @@ dependencies:
   flutter_markdown: ^0.6.6 #markdown渲染
   flutter_markdown_editor: ^2.0.0
   date_format: ^2.0.4 
+  
 
 dev_dependencies:
   flutter_test:

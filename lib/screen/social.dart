@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:test_app/screen/new_post.dart';
 import 'package:test_app/screen/social_detail.dart';
-import 'package:test_app/services/opendata_service.dart';
 import 'package:test_app/utils/token.dart';
 import 'package:test_app/widgets/social_card.dart';
 
@@ -17,39 +16,65 @@ class SocialPage extends StatefulWidget {
 class _SocialPage extends State<SocialPage> {
   Future<List<Map<String, dynamic>>>? posts;
   late String token;
-  Set<int> favoritePosts = Set<int>();
+  Set<int> socialFavoritePosts = Set<int>();
 
-  // 自定義方法：取得收藏列表
-  Future<Set<int>> fetchFavoritePosts(String token) async {
-    final response = await http.get(
-      Uri.parse('https://healnow.azurewebsites.net/saves'),
+  // 初始化狀態
+@override
+void initState() {
+  super.initState();
+  loadToken().then((loadedToken) {
+    token = loadedToken; // 在 Future 完成後設置 token
+
+    // 在初始化時取得貼文列表
+    posts = fetchPosts();
+
+    // 使用自定義方法取得收藏列表
+    fetchFavoritePosts(token).then((savedPosts) {
+      setState(() {
+        socialFavoritePosts = savedPosts.map<int>((post) => post['id']).toSet();
+      });
+    }).catchError((error) {
+      print('Error fetching saved posts: $error');
+    });
+  });
+}
+
+// 自定義方法：取得收藏列表
+Future<List<Map<String, dynamic>>> fetchFavoritePosts(String token) async {
+  final response = await http.get(
+    Uri.parse('https://healnow.azurewebsites.net/saves'),
+    headers: {'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body)['data'];
+    return data.map((json) => json as Map<String, dynamic>).toList();
+  } else {
+    throw Exception('Failed to load saved posts');
+  }
+}
+
+// 切換收藏狀態的方法
+Future<void> toggleFavoriteStatus(int postId, bool isFavorite) async {
+  final url = Uri.parse('https://healnow.azurewebsites.net/saves/$postId');
+
+  http.Response response;
+  if (isFavorite) {
+    response = await http.delete(
+      url,
       headers: {'Authorization': 'Bearer $token'},
     );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body)['data'];
-      return data.map<int>((post) => post['id']).toSet();
-    } else {
-      throw Exception('Failed to load saved posts');
-    }
+  } else {
+    response = await http.post(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
   }
 
-  // 切換收藏狀態的方法
-  void toggleFavoriteStatus(int postId) async {
-    try {
-      await OpenDataService().toggleFavoriteStatus(
-          token, 1, postId, favoritePosts.contains(postId));
-      setState(() {
-        if (favoritePosts.contains(postId)) {
-          favoritePosts.remove(postId);
-        } else {
-          favoritePosts.add(postId);
-        }
-      });
-    } catch (error) {
-      print('Error updating favorite status: $error');
-    }
+  if (response.statusCode != 200) {
+    throw Exception('Error updating favorite status');
   }
+}
 
   // 非同步函數：發送 API 請求取得貼文列表
   Future<List<Map<String, dynamic>>> fetchPosts() async {
@@ -67,24 +92,6 @@ class _SocialPage extends State<SocialPage> {
     }
   }
 
-  // 初始化狀態
-  @override
-  void initState() {
-    super.initState();
-    posts = fetchPosts(); // 在初始化時取得貼文列表
-    loadToken().then((loadedToken) {
-      token = loadedToken; // 在 Future 完成後設置 token
-
-      // 使用自定義方法取得收藏列表進行比對，以顯示收藏 icon 類型
-      fetchFavoritePosts(token).then((savedPosts) {
-        setState(() {
-          favoritePosts = savedPosts;
-        });
-      }).catchError((error) {
-        print('Error fetching saved posts: $error');
-      });
-    });
-  }
 
   // 刷新貼文的函數
   Future<void> _refreshPosts() async {
@@ -132,8 +139,16 @@ class _SocialPage extends State<SocialPage> {
                       itemBuilder: (context, index) {
                         var post = snapshot.data![index];
                         return PostCard(
-                          favoritePosts: favoritePosts,
-                          toggleFavoriteCallback: toggleFavoriteStatus,
+                          favoritePosts: socialFavoritePosts,
+                          toggleFavoriteCallback:
+                              (int postId, bool isFavorite) async {
+                            await toggleFavoriteStatus(postId, isFavorite);
+                             if (isFavorite) {
+                              socialFavoritePosts.add(postId);
+                            } else {
+                              socialFavoritePosts.remove(postId);
+                            }
+                          },
                           title: post['title'],
                           content: post['content'],
                           onTap: () {
