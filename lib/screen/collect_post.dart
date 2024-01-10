@@ -18,6 +18,19 @@ class _CollectPostPage extends State<CollectPostPage> {
   late String token;
   List<dynamic> allPosts = []; // 用於儲存所有資料
   List<dynamic> filteredPosts = []; // 用於儲存過濾後的資料
+  Set<int> favoritePosts = Set<int>(); // 新增這一行
+  
+
+  // 新增一個回呼函數，傳遞給 PostCard
+  void toggleFavoriteCallback(int postId) {
+    toggleFavoriteStatus(postId);
+  }
+
+
+  void toggleFavoriteStatus(int postId) async {
+    // 在這裡實現點擊收藏按鈕的邏輯，你可以參考 SocialPage.dart 中的 toggleFavoriteStatus 實現方式
+    toggleFavoriteStatus(postId);
+  }
 
   Future<List<Map<String, dynamic>>> fetchSavedPostsList(String token) async {
     final response = await http.get(
@@ -74,6 +87,8 @@ class _CollectPostPage extends State<CollectPostPage> {
                         var post = snapshot.data![index];
                         if (post != null) {
                           return PostCard(
+                            favoritePosts: favoritePosts, // 添加 favoritePosts
+                            toggleFavoriteCallback: toggleFavoriteCallback,
                             title: post['title'] ,
                             content: post['content'] ,
                             onTap: () {

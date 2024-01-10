@@ -13,7 +13,7 @@ class MedicationDetailPage extends StatefulWidget {
 
   @override
   State<MedicationDetailPage> createState() => _MedicationDetailPageState();
-}
+} 
 
 class _MedicationDetailPageState extends State<MedicationDetailPage> {
   late String token;

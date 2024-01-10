@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:test_app/screen/new_post.dart';
 import 'package:test_app/screen/social_detail.dart';
+import 'package:test_app/services/opendata_service.dart';
+import 'package:test_app/utils/token.dart';
 import 'package:test_app/widgets/social_card.dart';
 
 class SocialPage extends StatefulWidget {
@@ -14,7 +16,42 @@ class SocialPage extends StatefulWidget {
 
 class _SocialPage extends State<SocialPage> {
   Future<List<Map<String, dynamic>>>? posts;
+  late String token;
+  Set<int> favoritePosts = Set<int>();
 
+  // 自定義方法：取得收藏列表
+  Future<Set<int>> fetchFavoritePosts(String token) async {
+    final response = await http.get(
+      Uri.parse('https://healnow.azurewebsites.net/saves'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map<int>((post) => post['id']).toSet();
+    } else {
+      throw Exception('Failed to load saved posts');
+    }
+  }
+
+  // 切換收藏狀態的方法
+  void toggleFavoriteStatus(int postId) async {
+    try {
+      await OpenDataService().toggleFavoriteStatus(
+          token, 1, postId, favoritePosts.contains(postId));
+      setState(() {
+        if (favoritePosts.contains(postId)) {
+          favoritePosts.remove(postId);
+        } else {
+          favoritePosts.add(postId);
+        }
+      });
+    } catch (error) {
+      print('Error updating favorite status: $error');
+    }
+  }
+
+  // 非同步函數：發送 API 請求取得貼文列表
   Future<List<Map<String, dynamic>>> fetchPosts() async {
     final response = await http.get(Uri.parse(
       'https://healnow.azurewebsites.net/posts',
@@ -30,10 +67,30 @@ class _SocialPage extends State<SocialPage> {
     }
   }
 
+  // 初始化狀態
   @override
   void initState() {
     super.initState();
-    posts = fetchPosts();
+    posts = fetchPosts(); // 在初始化時取得貼文列表
+    loadToken().then((loadedToken) {
+      token = loadedToken; // 在 Future 完成後設置 token
+
+      // 使用自定義方法取得收藏列表進行比對，以顯示收藏 icon 類型
+      fetchFavoritePosts(token).then((savedPosts) {
+        setState(() {
+          favoritePosts = savedPosts;
+        });
+      }).catchError((error) {
+        print('Error fetching saved posts: $error');
+      });
+    });
+  }
+
+  // 刷新貼文的函數
+  Future<void> _refreshPosts() async {
+    setState(() {
+      posts = fetchPosts(); // 重新獲取貼文列表
+    });
   }
 
   @override
@@ -44,6 +101,7 @@ class _SocialPage extends State<SocialPage> {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 20),
+            // 搜尋框
             TextField(
               decoration: InputDecoration(
                 hintText: '名稱',
@@ -58,6 +116,7 @@ class _SocialPage extends State<SocialPage> {
               ),
             ),
             const SizedBox(height: 20),
+            // 貼文列表
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: posts,
@@ -73,6 +132,8 @@ class _SocialPage extends State<SocialPage> {
                       itemBuilder: (context, index) {
                         var post = snapshot.data![index];
                         return PostCard(
+                          favoritePosts: favoritePosts,
+                          toggleFavoriteCallback: toggleFavoriteStatus,
                           title: post['title'],
                           content: post['content'],
                           onTap: () {
@@ -99,14 +160,35 @@ class _SocialPage extends State<SocialPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      // 新增貼文按鈕
+      floatingActionButton: ElevatedButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => NewPostScreen()),
+            MaterialPageRoute(
+              builder: (context) =>
+                  NewPostScreen(refreshCallback: _refreshPosts),
+            ),
           );
         },
-        child: Icon(Icons.add),
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          backgroundColor: Colors.black, // 設定按鈕背景顏色
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.add,
+                color: Colors.white, // 設定圖示顏色
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
