@@ -11,6 +11,8 @@ class PostCard extends StatelessWidget {
   final String created_time;
   final String updated_time;
   final Function onTap;
+  final Function(int) toggleFavoriteCallback;
+  final Set<int> favoritePosts;
 
   const PostCard({
     required this.id,
@@ -21,6 +23,8 @@ class PostCard extends StatelessWidget {
     required this.username,
     required this.created_time,
     required this.updated_time,
+    required this.toggleFavoriteCallback,
+    required this.favoritePosts,
   });
 
   @override
@@ -75,10 +79,13 @@ class PostCard extends StatelessWidget {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.favorite_border),
+          icon: Icon(
+            favoritePosts.contains(id) == true ? Icons.favorite : Icons.favorite_border,
+            color: Colors.grey,
+          ),
           onPressed: () {
-            // 在這裡處理收藏按鈕的操作
-            // 可以調用一個收藏功能的函數
+            // 在這裡處理點擊收藏按鈕的邏輯
+            toggleFavoriteCallback(id);
           },
         ),
         onTap: () => onTap(),

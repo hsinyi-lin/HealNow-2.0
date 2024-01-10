@@ -53,7 +53,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.grey.withOpacity(0.5),
+            color: Colors.black,
+          ),
         );
       },
     );
