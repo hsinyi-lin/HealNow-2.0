@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:test_app/screen/new_post.dart';
-import 'package:test_app/screen/social_detail.dart';
-import 'package:test_app/utils/token.dart';
-import 'package:test_app/widgets/social_card.dart';
+import '../widgets/social_card.dart';
+import 'social_detail.dart';
 
 class SocialPage extends StatefulWidget {
   const SocialPage({Key? key}) : super(key: key);
@@ -15,66 +14,30 @@ class SocialPage extends StatefulWidget {
 
 class _SocialPage extends State<SocialPage> {
   Future<List<Map<String, dynamic>>>? posts;
-  late String token;
-  Set<int> socialFavoritePosts = Set<int>();
+  List<dynamic> allPosts = [];
+  List<dynamic> filteredPosts = [];
+  String searchQuery = '';
 
   // 初始化狀態
-@override
-void initState() {
-  super.initState();
-  loadToken().then((loadedToken) {
-    token = loadedToken; // 在 Future 完成後設置 token
-
-    // 在初始化時取得貼文列表
-    posts = fetchPosts();
-
-    // 使用自定義方法取得收藏列表
-    fetchFavoritePosts(token).then((savedPosts) {
-      setState(() {
-        socialFavoritePosts = savedPosts.map<int>((post) => post['id']).toSet();
-      });
-    }).catchError((error) {
-      print('Error fetching saved posts: $error');
+  @override
+  void initState() {
+    super.initState();
+    posts = fetchPosts().then((postList) {
+      allPosts = postList;
+      filteredPosts = postList;
+      return postList;
     });
-  });
-}
-
-// 自定義方法：取得收藏列表
-Future<List<Map<String, dynamic>>> fetchFavoritePosts(String token) async {
-  final response = await http.get(
-    Uri.parse('https://healnow.azurewebsites.net/saves'),
-    headers: {'Authorization': 'Bearer $token'},
-  );
-
-  if (response.statusCode == 200) {
-    final List<dynamic> data = json.decode(response.body)['data'];
-    return data.map((json) => json as Map<String, dynamic>).toList();
-  } else {
-    throw Exception('Failed to load saved posts');
-  }
-}
-
-// 切換收藏狀態的方法
-Future<void> toggleFavoriteStatus(int postId, bool isFavorite) async {
-  final url = Uri.parse('https://healnow.azurewebsites.net/saves/$postId');
-
-  http.Response response;
-  if (isFavorite) {
-    response = await http.delete(
-      url,
-      headers: {'Authorization': 'Bearer $token'},
-    );
-  } else {
-    response = await http.post(
-      url,
-      headers: {'Authorization': 'Bearer $token'},
-    );
   }
 
-  if (response.statusCode != 200) {
-    throw Exception('Error updating favorite status');
+  // 用於查詢後更新
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+      filteredPosts = allPosts.where((post) {
+        return post['title'].toString().contains(newQuery);
+      }).toList();
+    });
   }
-}
 
   // 非同步函數：發送 API 請求取得貼文列表
   Future<List<Map<String, dynamic>>> fetchPosts() async {
@@ -91,7 +54,6 @@ Future<void> toggleFavoriteStatus(int postId, bool isFavorite) async {
       throw Exception('Failed to load posts');
     }
   }
-
 
   // 刷新貼文的函數
   Future<void> _refreshPosts() async {
@@ -110,6 +72,7 @@ Future<void> toggleFavoriteStatus(int postId, bool isFavorite) async {
             const SizedBox(height: 20),
             // 搜尋框
             TextField(
+              onChanged: updateSearchQuery,
               decoration: InputDecoration(
                 hintText: '名稱',
                 prefixIcon: const Icon(Icons.search),
@@ -133,25 +96,18 @@ Future<void> toggleFavoriteStatus(int postId, bool isFavorite) async {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
+                    // Proceed with your ListView
                     return ListView.separated(
-                      itemCount: snapshot.data!.length,
+                      itemCount: filteredPosts.length,
                       separatorBuilder: (context, index) => Divider(),
                       itemBuilder: (context, index) {
-                        var post = snapshot.data![index];
+                        var post = filteredPosts[index];
+                        print(post['id']);
                         return PostCard(
-                          favoritePosts: socialFavoritePosts,
-                          toggleFavoriteCallback:
-                              (int postId, bool isFavorite) async {
-                            await toggleFavoriteStatus(postId, isFavorite);
-                             if (isFavorite) {
-                              socialFavoritePosts.add(postId);
-                            } else {
-                              socialFavoritePosts.remove(postId);
-                            }
-                          },
                           title: post['title'],
                           content: post['content'],
                           onTap: () {
+                            print("Post ${post['id']} clicked");
                             // 當用戶點擊貼文時，將貼文的 id 傳遞到 SocialDetailPage
                             Navigator.of(context).push(
                               MaterialPageRoute(
