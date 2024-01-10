@@ -83,18 +83,55 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       // 資訊還在載入中，顯示載入中的畫面
       return Scaffold(
         appBar: AppBar(
-          title: Text('貼文詳細資訊'),
+        title: Text('貼文詳細資訊'),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.black, Colors.white], // 自行調整顏色
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes the direction of the shadow
+              ),
+            ],
+          ),
         ),
+      ),
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.grey.withOpacity(0.5),
+            color: Colors.black,
+          ),
         ),
       );
     } else {
       // 資訊已經載入完成，顯示貼文詳細資訊
       return Scaffold(
         appBar: AppBar(
-          title: Text('貼文詳細資訊'),
+        title: Text('貼文詳細資訊'),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.black, Colors.white], // 自行調整顏色
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes the direction of the shadow
+              ),
+            ],
+          ),
         ),
+      ),
         body: SingleChildScrollView( // 加入 SingleChildScrollView
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -214,6 +251,9 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                       }
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.black
+                  ),
                   child: Text('留言'),
                 ),
                 SizedBox(height: 20),
