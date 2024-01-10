@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_app/screen/home.dart';
 
 class LoginScreen extends StatefulWidget {
-  @override 
+  @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -13,7 +13,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
+  // final TextEditingController genderController = TextEditingController();
+  String selectGender = 'M'; // gender
 
   String loginError = '';
   bool isRegisterMode = false;
@@ -62,14 +63,14 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } else {
         setState(() {
-          loginError = 'Login failed. Please check your credentials.';
+          loginError = '登入失敗, 請確認帳號密碼';
         });
       }
     } catch (error) {
       print('Login error: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to log in. Please try again.'),
+          content: Text('登入失敗, 請重新登入'),
           backgroundColor: Colors.red,
         ),
       );
@@ -85,13 +86,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> register(
       String email, String password, String username, String gender) async {
     try {
-      if (gender != "F" && gender != "M") {
+      if (gender == null) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Please input your gender: M or F'),
+              title: Text('性別未被選取'),
+              content: Text('請選擇性別'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -118,20 +119,17 @@ class _LoginScreenState extends State<LoginScreen> {
           'gender': gender,
         }),
       );
-
       print('Register response status code: ${response.statusCode}');
       print('Register response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Assuming the token is part of the response, adjust this line accordingly
         final responseData = jsonDecode(response.body);
         final token = responseData['access_token'] as String?;
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                HomePage(),
+            builder: (context) => HomePage(),
           ),
         );
       } else if (response.statusCode == 400) {
@@ -142,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Account Already Exists'),
+              title: Text('已被註冊的帳號'),
               content: Text(errorMessage),
               actions: <Widget>[
                 TextButton(
@@ -183,12 +181,12 @@ class _LoginScreenState extends State<LoginScreen> {
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
                 return AlertDialog(
-                  title: Text('Enter Verification Code'),
+                  title: Text('請輸入驗證碼'),
                   contentPadding:
                       EdgeInsets.only(top: 10, bottom: 5, left: 20, right: 20),
                   content: TextField(
                     onChanged: (value) => setState(() => code = value),
-                    decoration: InputDecoration(hintText: 'Verification Code'),
+                    decoration: InputDecoration(hintText: '驗證碼'),
                   ),
                   actions: [
                     ElevatedButton(
@@ -196,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         verifyCode(email, code);
                         Navigator.of(context).pop();
                       },
-                      child: Text('Verify Code'),
+                      child: Text('驗證碼'),
                     ),
                   ],
                 );
@@ -232,11 +230,11 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('Verify successfully');
+        print('驗證成功');
         // 驗證碼驗證成功，彈出更改密碼的對話框
         showChangePasswordDialog(email, token);
       } else {
-        throw Exception('Failed to verify code');
+        throw Exception('驗證失敗');
       }
     } catch (error) {
       print('Error: $error');
@@ -253,18 +251,18 @@ class _LoginScreenState extends State<LoginScreen> {
           String new_password = '';
 
           return AlertDialog(
-            title: Text('Change Password'),
+            title: Text('更改密碼'),
             contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
             content: Container(
               height: 80, // 調整高度
               child: Column(
                 children: [
-                  Text('Enter your new password:'),
+                  Text('輸入新密碼:'),
                   TextField(
                     onChanged: (value) => new_password = value,
                     obscureText: true,
                     decoration: InputDecoration(
-                      hintText: 'New Password',
+                      hintText: '新密碼',
                     ),
                   ),
                 ],
@@ -277,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   await changePassword(email, new_password);
                   Navigator.of(context).pop(); // 關閉對話框
                 },
-                child: Text('Change Password'),
+                child: Text('更改密碼'),
               ),
             ],
           );
@@ -316,8 +314,8 @@ class _LoginScreenState extends State<LoginScreen> {
           context: _scaffoldKey.currentContext!,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Password Change Successful'),
-              content: Text('Your password has been changed successfully.'),
+              title: Text('更改密碼成功'),
+              content: Text('請使用新密碼登入'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -334,8 +332,8 @@ class _LoginScreenState extends State<LoginScreen> {
           context: _scaffoldKey.currentContext!,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to change password. Please try again.'),
+              title: Text('更改密碼失敗'),
+              content: Text('請再試一次'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -384,9 +382,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(150),
                       child: Container(
                         color: Colors.white.withOpacity(0.5),
-                        child: Image.asset(
-                          'assets/images/login.png',
-                          fit: BoxFit.cover,
+                        // 因圖示被壓縮改成 AspectRatio
+                        child: AspectRatio(
+                          aspectRatio: 1.0,
+                          child: Image.asset(
+                            'assets/images/login.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -420,7 +422,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextField(
                             controller: passwordController,
                             decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: '密碼',
                               focusedBorder: OutlineInputBorder(
                                 borderSide:
                                     BorderSide(color: Colors.cyan.shade100),
@@ -437,7 +439,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextField(
                               controller: usernameController,
                               decoration: InputDecoration(
-                                labelText: 'Username',
+                                labelText: '用戶名稱',
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                       color: Colors.deepOrange.shade100),
@@ -449,17 +451,46 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            TextField(
-                              controller: genderController,
-                              decoration: InputDecoration(
-                                labelText: 'Gender',
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.blue.shade100),
+                            // Gender
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              //性別選單
+                              child: Container(
+                                margin: EdgeInsets.only(top: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: Border.all(
+                                      color: Color.fromARGB(36, 225, 39, 101),
+                                      width: 0.5),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300]!),
+                                child: DropdownButton<String>(
+                                  value: selectGender,
+                                  items: ['M', 'F'].map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(value),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    if (newValue != null) {
+                                      setState(() {
+                                        selectGender = newValue;
+                                      });
+                                    }
+                                  },
+                                  dropdownColor: Colors.white,
+                                  style: TextStyle(color: Colors.black),
+                                  icon: Icon(Icons.arrow_drop_down,
+                                      color: const Color.fromARGB(
+                                          144, 233, 30, 98)),
+                                  underline: Container(
+                                    height: 0,
+                                  ),
+                                  elevation: 1,
+                                  isExpanded: true,
                                 ),
                               ),
                             ),
@@ -474,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     emailController.text,
                                     passwordController.text,
                                     usernameController.text,
-                                    genderController.text,
+                                    selectGender,
                                   );
                                 } else {
                                   login(
@@ -492,7 +523,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fixedSize: Size(double.infinity, 50),
                               ),
                               child: Text(
-                                isRegisterMode ? 'Register' : 'Login',
+                                isRegisterMode ? '註冊' : '登入',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
@@ -511,9 +542,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               child: Text(
-                                isRegisterMode
-                                    ? 'Already have an account? Login'
-                                    : 'New user? Register',
+                                isRegisterMode ? '已經有帳號 ? 登入' : '沒有帳號 ? 註冊',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -536,12 +565,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                             builder: (BuildContext context,
                                                 StateSetter setState) {
                                               return AlertDialog(
-                                                title: Text('Forgot Password'),
+                                                title: Text('忘記密碼'),
                                                 content: Container(
                                                   height: 80, // 調整高度
                                                   child: Column(
                                                     children: [
-                                                      Text('Enter your email:'),
+                                                      Text('輸入Email'),
                                                       TextField(
                                                         onChanged: (value) =>
                                                             setState(() =>
@@ -563,7 +592,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                           .pop();
                                                     },
                                                     child: Text(
-                                                        'Send Verification Code'),
+                                                        '發送驗證碼'),
                                                   ),
                                                 ],
                                               );
@@ -579,7 +608,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ),
                                     child: Text(
-                                      'Forgot Password',
+                                      '忘記密碼',
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ),

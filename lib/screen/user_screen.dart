@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'login.dart';
+// import 'login.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +17,7 @@ class _UserScreenState extends State<UserScreen> {
   Map<String, dynamic> userData = {};
 
   late String token;
+  String? selectGender;
 
   TextStyle myTextStyle = TextStyle(
     fontSize: 16.0,
@@ -36,8 +37,9 @@ class _UserScreenState extends State<UserScreen> {
     // Load user image URL and data from SharedPreferences
     loadToken().then((loadedToken) {
       token = loadedToken;
-
+      print('Loaded token: $token');
       setState(() {
+        token = loadedToken;
         loadUserData();
         loadUserImageUrl();
       });
@@ -50,6 +52,7 @@ class _UserScreenState extends State<UserScreen> {
         Uri.parse('https://healnow.azurewebsites.net/user'),
         headers: {
           'Authorization': 'Bearer $token',
+          // 'Content-Type': 'application/json',
         },
       );
 
@@ -58,6 +61,7 @@ class _UserScreenState extends State<UserScreen> {
         final Map<String, dynamic> responseData = json.decode(response.body);
         setState(() {
           userData = responseData['data'];
+          selectGender = userData['gender'];
         });
       } else {
         print('Failed to load user data. Status code: ${response.statusCode}');
@@ -83,14 +87,15 @@ class _UserScreenState extends State<UserScreen> {
   }
 
   void showUpdateProfileDialog() {
-    TextEditingController usernameController = TextEditingController(text:userData['username']);
-    TextEditingController genderController = TextEditingController(text: userData['gender']);
+    TextEditingController usernameController =
+        TextEditingController(text: userData['username']);
+    // TextEditingController genderController = TextEditingController(text: userData['gender']);
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Update Profile'),
+          title: Text('更新資料'),
           content: Container(
             height: 200, // Set the desired height
             child: Column(
@@ -100,15 +105,31 @@ class _UserScreenState extends State<UserScreen> {
                   onChanged: (value) {
                     // Handle the username input
                   },
-                  decoration: InputDecoration(labelText: 'Username'),
+                  decoration: InputDecoration(labelText: '更新用戶名稱'),
                 ),
-                TextField(
-                  controller: genderController,
-                  onChanged: (value) {
-                    // Handle the gender input
+                SizedBox(height: 4.0),
+                //性別選單
+                DropdownButton<String>(
+                  value: selectGender,
+                  isExpanded: true, // Set isExpanded to true
+                  items: ['M', 'F'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(value),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        selectGender = newValue;
+                      });
+                    }
                   },
-                  decoration: InputDecoration(labelText: 'Gender'),
                 ),
+
                 SizedBox(height: 16.0), // Add some spacing
                 ElevatedButton(
                   onPressed: () async {
@@ -117,7 +138,7 @@ class _UserScreenState extends State<UserScreen> {
                     // Save base64 image to SharedPreferences
                     saveUserImageUrl(base64Image);
                   },
-                  child: Text('Choose Photo'),
+                  child: Text('選擇頭貼'),
                 ),
               ],
             ),
@@ -127,24 +148,24 @@ class _UserScreenState extends State<UserScreen> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: Text('取消'),
             ),
             TextButton(
               onPressed: () {
                 // Get the updated username and gender from the text fields
                 final updatedUsername = usernameController.text;
-                final updatedGender = genderController.text;
+                // final updatedGender = genderController.text;
 
                 // Call the updateUserProfile method with the updated values
                 updateUserProfile(
                   username: updatedUsername,
-                  gender: updatedGender,
+                  gender: selectGender,
                   photo: _imageUrl, // Use the stored image URL
                 );
 
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Update'),
+              child: Text('送出'),
             ),
           ],
         );
@@ -193,7 +214,7 @@ class _UserScreenState extends State<UserScreen> {
 
   Future<void> updateUserProfile({
     required String username,
-    required String gender,
+    String? gender,
     required String photo,
   }) async {
     // Make API call to update user profile
@@ -210,9 +231,9 @@ class _UserScreenState extends State<UserScreen> {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'username': username,
-          'gender': gender,
-          'photo': photo,
+          '用戶': username,
+          '性別': gender,
+          '照片': photo,
           // 'photo': _imageUrl,
         }),
       );
@@ -334,24 +355,24 @@ class _UserScreenState extends State<UserScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(height: 16.0),
-                          Text('Username: ${userData['username']}',
+                          Text('用戶: ${userData['username']}',
                               style: myTextStyle),
                           SizedBox(height: 8.0),
                           Text('Email: ${userData['email']}',
                               style: myTextStyle),
                           SizedBox(height: 8.0),
-                          Text('Gender: ${userData['gender']}',
+                          Text('性別: ${userData['gender']}',
                               style: myTextStyle),
                           SizedBox(height: 80.0),
-                          Text('Created Time: ${userData['created_time']}',
+                          Text('註冊時間: ${userData['created_time']}',
                               style: secondTextStyle),
                           SizedBox(height: 8.0),
-                          Text('Updated Time: ${userData['updated_time']}',
+                          Text('上次更新: ${userData['updated_time']}',
                               style: secondTextStyle),
                           SizedBox(height: 30.0),
                           ElevatedButton(
                             onPressed: showUpdateProfileDialog,
-                            child: Text('Update Profile'),
+                            child: Text('更新資料'),
                           ),
                         ],
                       ),
