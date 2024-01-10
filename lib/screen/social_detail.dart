@@ -52,7 +52,77 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       }).catchError((error) {
         print('Error fetching like count: $error');
       });
+
+      fetchSavedPosts(token).then((savedPosts) {
+        setState(() {
+          isFavorite =
+              savedPosts.any((savedPost) => savedPost['post_id'] == widget.postId);
+          print(isFavorite);
+          print(widget.postId);
+        });
+      }).catchError((error) {
+        print('Error fetching saved medications: $error');
+      });
     });
+  }
+
+  // 收藏狀態
+  Future<void> toggleFavoriteStatus_1() async {
+    try {
+      bool currentFavoriteStatus = isFavorite ?? false;
+      await toggleFavoriteStatus_2(token, widget.postId, currentFavoriteStatus);
+
+      setState(() {
+        isFavorite = !currentFavoriteStatus;
+        // 更新收藏次數
+        if (isFavorite!) {  
+          postDetails['saved_cnt'] = (postDetails['saved_cnt'] ?? 0) + 1;
+        } else {
+          postDetails['saved_cnt'] = (postDetails['saved_cnt'] ?? 0) - 1;
+        }
+      });
+    } catch (error) {
+      print('Error updating favorite status 1: $error');
+    }
+  }
+
+
+  Future<void> toggleFavoriteStatus_2(
+      String token, int postId, bool isFavorite) async {
+    final url = Uri.parse('https://healnow.azurewebsites.net/saves/$postId');
+
+    http.Response response;
+    if (isFavorite) {
+      response = await http.delete(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } else {
+      response = await http.post(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    }
+
+    if (response.statusCode != 200) {
+      print(response.statusCode);
+      throw Exception('Error updating favorite status 2');
+    }
+  }
+
+  // 新增取得按讚數的 API 請求
+  Future<List<Map<String, dynamic>>> fetchSavedPosts(String token) async {
+    final response = await http.get(
+      Uri.parse('https://healnow.azurewebsites.net/saves'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((json) => json as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Failed to load saved list');
+    }
   }
 
 // 新增取得按讚數的 API 請求
@@ -118,7 +188,7 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       final Map<String, dynamic> data =
           json.decode(const Utf8Decoder().convert(response.bodyBytes));
       final Map<String, dynamic> postDetails = data['data'];
-      print(postDetails);
+      // print(postDetails);
       return postDetails;
     } else {
       throw Exception('Failed to load post details');
@@ -222,15 +292,26 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                 children: [
                   // 貼文發布者
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.account_circle, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        '發文者: ${postDetails['username']}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        children: [
+                          Icon(Icons.account_circle, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            '發文者: ${postDetails['username']}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: Icon(isFavorite == true
+                            ? Icons.bookmark
+                            : Icons.bookmark_border),
+                        onPressed: toggleFavoriteStatus_1,
                       ),
                     ],
                   ),
@@ -324,9 +405,10 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                         try {
                           await addComment(widget.postId, token, content);
 
-                          // 刷新留言列表
-                          setState(() {
-                            fetchPostDetails(widget.postId).then((details) {
+                          // 重新獲取貼文資訊
+                          fetchPostDetails(widget.postId).then((details) {
+                            setState(() {
+                              postDetails = details;
                               comments = details['comment'] ?? [];
                             });
                           });
@@ -348,8 +430,8 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
                       final comment = comments[index];
-                      print('-----------------');
-                      print(comment);
+                      // print('-----------------');
+                      // print(comment);
 
                       return CommentCard(
                         id: comment['id'],
