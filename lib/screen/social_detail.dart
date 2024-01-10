@@ -59,7 +59,7 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
   }
 
 // 新增留言的 API 請求
-  Future<bool> addComment(int postId, String token, String content) async {
+  Future<void> addComment(int postId, String token, String content) async {
     final response = await http.post(
       Uri.parse('https://healnow.azurewebsites.net/comments/$postId'),
       headers: {
@@ -95,7 +95,8 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
         appBar: AppBar(
           title: Text('貼文詳細資訊'),
         ),
-        body: Padding(
+        body: SingleChildScrollView( // 加入 SingleChildScrollView
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -189,7 +190,30 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                 SizedBox(height: 10),
                 // ElevatedButton 用於提交留言
                 ElevatedButton(
-                  onPressed: () async {},
+                  //新增留言邏輯
+                  onPressed: () async {
+                    String content = commentController.text;
+
+                    // 檢查是否輸入了留言內容
+                    if (content.isNotEmpty) {
+                      // 調用新增留言的 API
+                      try {
+                        await addComment(widget.postId, token, content);
+
+                        // 刷新留言列表
+                        setState(() {
+                          fetchPostDetails(widget.postId).then((details) {
+                            comments = details['comment'] ?? [];
+                          });
+                        });
+
+                        // 清空留言輸入框
+                        commentController.clear();
+                      } catch (error) {
+                        print('Error adding comment: $error');
+                      }
+                    }
+                  },
                   child: Text('留言'),
                 ),
                 SizedBox(height: 20),
@@ -215,6 +239,7 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
               ],
             ),
           ),
+        ),
         ),
       );
     }
