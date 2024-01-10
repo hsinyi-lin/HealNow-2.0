@@ -1,6 +1,7 @@
 // CommentCard.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CommentCard extends StatelessWidget {
   final int id;
@@ -21,6 +22,10 @@ class CommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String formattedUpadteTime = 'N/A';
+
+    final dateTime = DateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", 'en_US').parse(updatedTime);
+    formattedUpadteTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       shape: RoundedRectangleBorder(
@@ -42,7 +47,7 @@ class CommentCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 12, bottom: 12),
             child: Text(
-              '回覆更新時間: $updatedTime',
+              '回覆更新時間: $formattedUpadteTime',
               style: TextStyle(
                 color: Colors.grey[600],
               ),

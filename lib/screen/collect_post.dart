@@ -18,18 +18,43 @@ class _CollectPostPage extends State<CollectPostPage> {
   late String token;
   List<dynamic> allPosts = []; // 用於儲存所有資料
   List<dynamic> filteredPosts = []; // 用於儲存過濾後的資料
-  Set<int> favoritePosts = Set<int>(); // 新增這一行
-  
+  Set<int> collectFavoritePosts = Set<int>();
 
-  // 新增一個回呼函數，傳遞給 PostCard
-  void toggleFavoriteCallback(int postId) {
-    toggleFavoriteStatus(postId);
+  // 自定義方法：取得收藏列表
+  Future<Set<int>> fetchFavoritePosts(String token) async {
+    final response = await http.get(
+      Uri.parse('https://healnow.azurewebsites.net/saves'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map<int>((post) => post['post_id']).toSet();
+    } else {
+      throw Exception('Failed to load saved posts');
+    }
   }
 
+  // 切換收藏狀態的方法
+  Future<void> toggleFavoriteStatus(int postId, bool isFavorite) async {
+    final url = Uri.parse('https://healnow.azurewebsites.net/saves/$postId');
 
-  void toggleFavoriteStatus(int postId) async {
-    // 在這裡實現點擊收藏按鈕的邏輯，你可以參考 SocialPage.dart 中的 toggleFavoriteStatus 實現方式
-    toggleFavoriteStatus(postId);
+    http.Response response;
+    if (isFavorite) {
+      response = await http.delete(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } else {
+      response = await http.post(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    }
+
+    if (response.statusCode != 200) {
+      throw Exception('Error updating favorite status');
+    }
   }
 
   Future<List<Map<String, dynamic>>> fetchSavedPostsList(String token) async {
@@ -87,10 +112,13 @@ class _CollectPostPage extends State<CollectPostPage> {
                         var post = snapshot.data![index];
                         if (post != null) {
                           return PostCard(
-                            favoritePosts: favoritePosts, // 添加 favoritePosts
-                            toggleFavoriteCallback: toggleFavoriteCallback,
-                            title: post['title'] ,
-                            content: post['content'] ,
+                            favoritePosts: collectFavoritePosts, // 添加 favoritePosts
+                            toggleFavoriteCallback:
+                                (int postId, bool isFavorite) async {
+                              await toggleFavoriteStatus(postId, isFavorite);
+                            },
+                            title: post['title'],
+                            content: post['content'],
                             onTap: () {
                               // 當用戶點擊貼文時，將貼文的 id 傳遞到 SocialDetailPage
                               Navigator.of(context).push(
