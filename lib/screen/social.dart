@@ -112,16 +112,34 @@ class _SocialPage extends State<SocialPage> {
         ),
       ),
       // 新增貼文按鈕
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: ElevatedButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NewPostScreen(refreshCallback: _refreshPosts),
-              ),
+              builder: (context) =>
+                  NewPostScreen(refreshCallback: _refreshPosts),
+            ),
           );
         },
-        child: Icon(Icons.add),
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ), 
+          backgroundColor: Colors.black, // 設定按鈕背景顏色
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.add,
+                color: Colors.white, // 設定圖示顏色
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
