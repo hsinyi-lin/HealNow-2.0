@@ -62,7 +62,7 @@ class _CollectPageState extends State<CollectPage> {
                       CollectMedPage(),
                       CollectNewsPage(),
                       CollectRumorPage(),
-                      CollectPostPage(),
+                      // CollectPostPage(),
                     ],
                   ),
                 ),
