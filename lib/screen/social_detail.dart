@@ -351,20 +351,26 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                     children: [
                       Icon(Icons.title, size: 20),
                       SizedBox(width: 8),
-                      Text(
-                        '標題: ${postDetails['title']}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
+                      Flexible(
+                        child: Text(
+                          '標題: ${postDetails['title']}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                          ),
+                          softWrap: true, // 允許換行
+                          overflow: TextOverflow.visible, // 可見的部分不被裁剪
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 16),
-                  // 貼文內文
+// 貼文內文
                   Text(
                     '內文: ${postDetails['content']}',
                     style: TextStyle(fontSize: 18),
+                    softWrap: true, // 允許換行
+                    overflow: TextOverflow.visible, // ˊ可見的部分不被裁剪
                   ),
                   SizedBox(height: 20),
                   // 貼文點讚數和觀看次數
