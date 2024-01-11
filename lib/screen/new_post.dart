@@ -85,8 +85,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
             Container(
               margin: EdgeInsets.only(bottom: 20),
@@ -103,10 +102,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
+                child: Image.asset(
                   'assets/images/healnow.png',
                   fit: BoxFit.contain,
-                  height: 200,
+                  height: 100,
                   width: double.infinity,
                 ),
               ),
@@ -159,34 +158,27 @@ class _NewPostScreenState extends State<NewPostScreen> {
               ),
             ),
             SizedBox(height: 10),
-            Expanded(
-              child: TextField(
-                controller: _contentController,
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
-                  hintText: '內容',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(1.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  prefixIcon: Icon(Icons.text_fields),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(1.0),
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+            TextField(
+              controller: _contentController,
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                hintText: '內容',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(1.0),
                 ),
-                // 調整TextField的大小
-                // 若要調整寬度，可以使用`contentPadding`屬性
-                // 若要調整高度，可以使用`expands`屬性為true，以支持多行輸入
-                // 若要同時調整寬度和高度，可以使用`constrainedBox`屬性
-                // 例如：constrainedBox: BoxConstraints(maxHeight: 100),
+                filled: true,
+                fillColor: Colors.grey[200],
+                prefixIcon: Icon(Icons.text_fields),
+                contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(1.0),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
               ),
             ),
             SizedBox(height: 20),
@@ -229,7 +221,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 500),
           ],
         ),
       ),
