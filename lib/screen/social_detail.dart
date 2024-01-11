@@ -18,6 +18,7 @@ class SocialDetailPage extends StatefulWidget {
 class _SocialDetailPageState extends State<SocialDetailPage> {
   late String token;
   bool? isFavorite;
+  bool? isLike;
   late Map<String, dynamic> postDetails = {};
   late List<dynamic> comments = []; // 新增 comments 變數
   late TextEditingController commentController;
@@ -44,20 +45,23 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
         print('Error fetching post details: $error');
       });
 
-      // 取得按讚數的 API 請求
-      fetchLikeCount(widget.postId, token).then((likeCount) {
-        setState(() {
-          postDetails['like_cnt'] = likeCount;
-        });
-      }).catchError((error) {
-        print('Error fetching like count: $error');
-      });
-
       fetchSavedPosts(token).then((savedPosts) {
         setState(() {
-          isFavorite =
-              savedPosts.any((savedPost) => savedPost['post_id'] == widget.postId);
+          isFavorite = savedPosts
+              .any((savedPost) => savedPost['post_id'] == widget.postId);
           print(isFavorite);
+          print(widget.postId);
+        });
+      }).catchError((error) {
+        print('Error fetching saved medications: $error');
+      });
+
+      fetchLikedPosts(token).then((likedPosts) {
+        setState(() {
+          isLike = likedPosts
+              .any((likedPost) => likedPost['post_id'] == widget.postId);
+          print(isLike);
+          print('---------');
           print(widget.postId);
         });
       }).catchError((error) {
@@ -75,7 +79,7 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       setState(() {
         isFavorite = !currentFavoriteStatus;
         // 更新收藏次數
-        if (isFavorite!) {  
+        if (isFavorite!) {
           postDetails['saved_cnt'] = (postDetails['saved_cnt'] ?? 0) + 1;
         } else {
           postDetails['saved_cnt'] = (postDetails['saved_cnt'] ?? 0) - 1;
@@ -86,7 +90,7 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
     }
   }
 
-
+  // 使用於收藏
   Future<void> toggleFavoriteStatus_2(
       String token, int postId, bool isFavorite) async {
     final url = Uri.parse('https://healnow.azurewebsites.net/saves/$postId');
@@ -110,7 +114,53 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
     }
   }
 
-  // 新增取得按讚數的 API 請求
+  // 按讚狀態
+  Future<void> toggleFavoriteStatus_3() async {
+    try {
+      bool currentFavoriteStatus = isLike ?? false;
+      await toggleFavoriteStatus_4(token, widget.postId, currentFavoriteStatus);
+
+      setState(() {
+        isLike = !currentFavoriteStatus;
+        // 更新收藏次數
+        if (isLike!) {
+          postDetails['like_cnt'] = (postDetails['like_cnt'] ?? 0) + 1;
+        } else {
+          postDetails['like_cnt'] = (postDetails['like_cnt'] ?? 0) - 1;
+        }
+      });
+    } catch (error) {
+      print('Error updating favorite status 3: $error');
+    }
+  }
+
+  // 使用於按讚、取消讚
+  Future<void> toggleFavoriteStatus_4(
+      String token, int postId, bool isFavorite) async {
+    final url =
+        Uri.parse('https://healnow.azurewebsites.net/posts/like/$postId');
+
+    http.Response response;
+    if (isFavorite) {
+      response = await http.delete(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } else {
+      print('post');
+      response = await http.post(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    }
+
+    if (response.statusCode != 200) {
+      print(response.statusCode);
+      throw Exception('Error updating favorite status 4');
+    }
+  }
+
+  // 取得收藏貼文列表的 API 請求
   Future<List<Map<String, dynamic>>> fetchSavedPosts(String token) async {
     final response = await http.get(
       Uri.parse('https://healnow.azurewebsites.net/saves'),
@@ -119,6 +169,22 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((json) => json as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Failed to load saved list');
+    }
+  }
+
+  // 取得按讚貼文列表的 API 請求
+  Future<List<Map<String, dynamic>>> fetchLikedPosts(String token) async {
+    final response = await http.get(
+      Uri.parse('https://healnow.azurewebsites.net/posts/like'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      print(data.map((json) => json as Map<String, dynamic>).toList());
       return data.map((json) => json as Map<String, dynamic>).toList();
     } else {
       throw Exception('Failed to load saved list');
@@ -140,42 +206,6 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
       return data['like_count'];
     } else {
       throw Exception('Failed to load like count');
-    }
-  }
-
-  // 新增按讚的 API 請求
-  Future<void> likePost(int postId) async {
-    final response = await http.post(
-      Uri.parse('https://healnow.azurewebsites.net/posts/like/$postId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      // 按讚成功
-      print('Post liked successfully');
-    } else {
-      // 按讚失敗
-      print('Failed to like post');
-    }
-  }
-
-  // 新增取消按讚的 API 請求
-  Future<void> unlikePost(int postId) async {
-    final response = await http.delete(
-      Uri.parse('https://healnow.azurewebsites.net/posts/like/$postId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      // 取消按讚成功
-      print('Post unliked successfully');
-    } else {
-      // 取消按讚失敗
-      print('Failed to unlike post');
     }
   }
 
@@ -344,24 +374,10 @@ class _SocialDetailPageState extends State<SocialDetailPage> {
                       Row(
                         children: [
                           IconButton(
-                            icon: Icon(isLiked
+                            icon: Icon(isLike == true
                                 ? Icons.thumb_up
                                 : Icons.thumb_up_outlined),
-                            onPressed: () {
-                              setState(() {
-                                // 切換按讚的狀態
-                                isLiked = !isLiked;
-
-                                // 根據按讚狀態調用相應的 API
-                                if (isLiked) {
-                                  likePost(widget.postId);
-                                  postDetails['like_cnt'] += 1; // 按讚數加一
-                                } else {
-                                  unlikePost(widget.postId);
-                                  postDetails['like_cnt'] -= 1; // 按讚數減一
-                                }
-                              });
-                            },
+                            onPressed: toggleFavoriteStatus_3,
                           ),
                           SizedBox(width: 8),
                           Text('點讚數: ${postDetails['like_cnt']}'),
