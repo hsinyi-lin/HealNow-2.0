@@ -38,8 +38,6 @@ HealNow integrates OpenData from the **Taiwan Food and Drug Administration (FDA)
 3. **Pharmacy Information Dataset** - 藥局基本資料  
    🔗 [Dataset Link](https://data.fda.gov.tw/frontsite/data/DataAction.do?method=doDetail&infoId=35)
 
-## 🔗 API Specification
-[View API Documentation](https://github.com/hsinyi-lin/HealNow-2.0-API-spec)
-
-## 🔗 Flask API Endpoint
-[View Flask API](https://github.com/hsinyi-lin/HealNow-2.0-api)
+## 🔗 Links
+- **API Specification**: [View API Specification](https://github.com/hsinyi-lin/HealNow-2.0-API-spec)
+- **Flask API Endpoint**: [View Flask API](https://github.com/hsinyi-lin/HealNow-2.0-api)
